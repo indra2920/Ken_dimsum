@@ -5,33 +5,44 @@ const globalForPrisma = globalThis as unknown as {
     prisma: PrismaClient | undefined;
 };
 
+/**
+ * Creates a new Prisma client with the Neon adapter.
+ * Only called when actually needed during runtime.
+ */
 function createPrismaClient() {
     const url = process.env.DATABASE_URL;
 
-    // During build, DATABASE_URL might be missing. 
-    // We must NOT return a standard PrismaClient() if the schema has no URL, 
-    // as it will crash looking for a datasource.
     if (!url) {
-        if (process.env.NODE_ENV === 'production') {
-            console.log('Skipping Prisma initialization during build (no DATABASE_URL)');
-        }
-        return null as unknown as PrismaClient;
+        throw new Error(
+            'Koneksi database (DATABASE_URL) tidak ditemukan. ' +
+            'Pastikan Environment Variables sudah terpasang di Vercel.'
+        );
     }
 
     try {
         const adapter = new PrismaNeon({
             connectionString: url,
         });
-        return new PrismaClient({ adapter } as any);
-    } catch (error) {
-        console.error('Failed to create Prisma Neon adapter:', error);
-        return null as unknown as PrismaClient;
+        const client = new PrismaClient({ adapter } as any);
+
+        if (process.env.NODE_ENV !== 'production') {
+            globalForPrisma.prisma = client;
+        }
+
+        return client;
+    } catch (error: any) {
+        console.error('Gagal inisialisasi Prisma Neon:', error);
+        throw new Error(`Gagal menghubungkan ke database: ${error.message}`);
     }
 }
 
-export const prisma: PrismaClient =
-    globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== 'production') {
-    globalForPrisma.prisma = prisma;
-}
+// Export a Proxy that initializes the real Prisma client on first access.
+// This prevents build-time errors while allowing runtime functionality.
+export const prisma = new Proxy({} as PrismaClient, {
+    get: (target, prop) => {
+        if (!globalForPrisma.prisma) {
+            globalForPrisma.prisma = createPrismaClient();
+        }
+        return (globalForPrisma.prisma as any)[prop];
+    }
+});
