@@ -1,0 +1,45 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id          String @id @default(cuid())
+  name        String
+  price       Float
+  category    String
+  image       String
+  description String
+  stock       Int
+}
+
+model Order {
+  id               String   @id @default(cuid())
+  customerName     String
+  customerWhatsapp String
+  tableNumber      String
+  items            Json
+  total            Float
+  status           String   @default("BARU")
+  createdAt        DateTime @default(now())
+  notes            String?
+  paymentMethod    String
+  paymentProof     String?
+  deliveryMethod   String
+}
+
+model Settings {
+  id          String @id @default("store")
+  storeName   String
+  ownerName   String
+  address     String
+  whatsapp    String
+  bankAccount String
+  password    String
+}
