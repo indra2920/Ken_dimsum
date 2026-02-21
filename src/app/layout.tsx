@@ -1,4 +1,4 @@
-// Deployment trigger: 2026-02-21
+// Deployment trigger: 2026-02-21 v3 (Proxy Fix)
 import type { Metadata } from "next";
 
 export const dynamic = 'force-dynamic';
