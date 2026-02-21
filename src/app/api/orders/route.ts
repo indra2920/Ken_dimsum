@@ -1,10 +1,18 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-// GET all orders
-export async function GET() {
+// GET all orders by store
+export async function GET(request: Request) {
     try {
+        const { searchParams } = new URL(request.url);
+        const storeId = searchParams.get('storeId');
+
+        if (!storeId) {
+            return NextResponse.json({ error: 'Store ID is required' }, { status: 400 });
+        }
+
         const orders = await prisma.order.findMany({
+            where: { storeId },
             orderBy: { createdAt: 'desc' },
         });
         return NextResponse.json(orders);
@@ -17,22 +25,30 @@ export async function GET() {
 export async function POST(request: Request) {
     try {
         const body = await request.json();
+        const { storeId, ...data } = body;
+
+        if (!storeId) {
+            return NextResponse.json({ error: 'Store ID is required' }, { status: 400 });
+        }
+
         const order = await prisma.order.create({
             data: {
-                customerName: body.customerName,
-                customerWhatsapp: body.customerWhatsapp,
-                tableNumber: body.tableNumber,
-                items: body.items,
-                total: body.total,
+                customerName: data.customerName,
+                customerWhatsapp: data.customerWhatsapp,
+                tableNumber: data.tableNumber,
+                items: data.items,
+                total: data.total,
                 status: 'BARU',
-                notes: body.notes ?? null,
-                paymentMethod: body.paymentMethod,
-                paymentProof: body.paymentProof ?? null,
-                deliveryMethod: body.deliveryMethod,
+                notes: data.notes ?? null,
+                paymentMethod: data.paymentMethod,
+                paymentProof: data.paymentProof ?? null,
+                deliveryMethod: data.deliveryMethod,
+                storeId: storeId,
             },
         });
         return NextResponse.json(order, { status: 201 });
     } catch (error) {
+        console.error('Create order error:', error);
         return NextResponse.json({ error: 'Failed to create order' }, { status: 500 });
     }
 }

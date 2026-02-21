@@ -17,6 +17,8 @@ model Product {
   image       String
   description String
   stock       Int
+  storeId     String
+  store       Store  @relation(fields: [storeId], references: [id])
 }
 
 model Order {
@@ -32,14 +34,20 @@ model Order {
   paymentMethod    String
   paymentProof     String?
   deliveryMethod   String
+  storeId          String
+  store            Store    @relation(fields: [storeId], references: [id])
 }
 
-model Settings {
-  id          String @id @default("store")
-  storeName   String
-  ownerName   String
-  address     String
-  whatsapp    String
-  bankAccount String
-  password    String
+model Store {
+  id             String @id @default(cuid())
+  storeName      String @unique
+  ownerName      String
+  address        String
+  whatsapp       String
+  bankAccount    String
+  qrisImage      String?
+  paymentMethods String[] @default(["Tunai"])
+  password       String
+  products       Product[]
+  orders         Order[]
 }

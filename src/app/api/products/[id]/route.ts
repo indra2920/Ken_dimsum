@@ -9,15 +9,21 @@ export async function PUT(
     try {
         const { id } = await params;
         const body = await request.json();
+        const { storeId, ...data } = body;
+
+        if (!storeId) {
+            return NextResponse.json({ error: 'Store ID is required' }, { status: 400 });
+        }
+
         const product = await prisma.product.update({
-            where: { id },
+            where: { id, storeId }, // Verify it belongs to the store
             data: {
-                name: body.name,
-                price: body.price,
-                category: body.category,
-                image: body.image,
-                description: body.description,
-                stock: body.stock,
+                name: data.name,
+                price: parseFloat(data.price),
+                category: data.category,
+                image: data.image,
+                description: data.description,
+                stock: parseInt(data.stock),
             },
         });
         return NextResponse.json(product);
@@ -33,7 +39,16 @@ export async function DELETE(
 ) {
     try {
         const { id } = await params;
-        await prisma.product.delete({ where: { id } });
+        const { searchParams } = new URL(request.url);
+        const storeId = searchParams.get('storeId');
+
+        if (!storeId) {
+            return NextResponse.json({ error: 'Store ID is required' }, { status: 400 });
+        }
+
+        await prisma.product.delete({
+            where: { id, storeId }
+        });
         return NextResponse.json({ success: true });
     } catch (error) {
         return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 });

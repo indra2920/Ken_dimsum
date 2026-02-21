@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useAuth } from './AuthContext';
 
 export interface Product {
     id: string;
@@ -28,19 +29,27 @@ interface ProductContextType {
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
 
 export function ProductProvider({ children }: { children: ReactNode }) {
+    const { storeProfile } = useAuth();
     const [products, setProducts] = useState<Product[]>([]);
     const [categories, setCategories] = useState<string[]>(['Kukus', 'Goreng', 'Minuman']);
     const [lowStockAlerts, setLowStockAlerts] = useState<Product[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    const storeId = storeProfile?.id;
 
     const checkLowStock = (currentProducts: Product[]) => {
         setLowStockAlerts(currentProducts.filter(p => p.stock < 10));
     };
 
     const fetchProducts = async (retries = 3) => {
+        if (!storeId) {
+            setIsLoading(false);
+            return;
+        }
+
         for (let attempt = 1; attempt <= retries; attempt++) {
             try {
-                const res = await fetch('/api/products');
+                const res = await fetch(`/api/products?storeId=${storeId}`);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data: Product[] = await res.json();
                 setProducts(data);
@@ -67,14 +76,15 @@ export function ProductProvider({ children }: { children: ReactNode }) {
 
     useEffect(() => {
         fetchProducts();
-    }, []);
+    }, [storeId]);
 
 
     const addProduct = async (newProduct: Omit<Product, 'id'>) => {
+        if (!storeId) return;
         const res = await fetch('/api/products', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newProduct),
+            body: JSON.stringify({ ...newProduct, storeId }),
         });
         if (!res.ok) throw new Error('Failed to add product');
         const created: Product = await res.json();
@@ -83,10 +93,11 @@ export function ProductProvider({ children }: { children: ReactNode }) {
     };
 
     const updateProduct = async (updatedProduct: Product) => {
+        if (!storeId) return;
         const res = await fetch(`/api/products/${updatedProduct.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(updatedProduct),
+            body: JSON.stringify({ ...updatedProduct, storeId }),
         });
         if (!res.ok) throw new Error('Failed to update product');
         const updated: Product = await res.json();
@@ -95,7 +106,8 @@ export function ProductProvider({ children }: { children: ReactNode }) {
     };
 
     const deleteProduct = async (id: string) => {
-        const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+        if (!storeId) return;
+        const res = await fetch(`/api/products/${id}?storeId=${storeId}`, { method: 'DELETE' });
         if (!res.ok) throw new Error('Failed to delete product');
         const remaining = products.filter(p => p.id !== id);
         setProducts(remaining);

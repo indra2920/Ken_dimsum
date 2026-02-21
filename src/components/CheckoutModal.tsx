@@ -112,7 +112,8 @@ Mohon diproses ya! Terima kasih.`;
         // 3. User Feedback & Action
         if (confirm("Pesanan berhasil dibuat! \n\nKlik OK untuk mengirim konfirmasi ke WhatsApp juga. \n(JANGAN LUPA: Kirimkan foto bukti transfer yang tadi Anda upload di chat WhatsApp agar pesanan cepat diproses).")) {
             const encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/${storeProfile.whatsapp}?text=${encodedMessage}`, '_blank');
+            const waNumber = storeProfile?.whatsapp || '6281234567890';
+            window.open(`https://wa.me/${waNumber}?text=${encodedMessage}`, '_blank');
         }
 
         onClearCart();
@@ -276,6 +277,7 @@ Mohon diproses ya! Terima kasih.`;
                         </div>
                     )}
 
+                    {/* Payment Method Selection */}
                     <div>
                         <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Metode Pembayaran</label>
                         <select
@@ -283,19 +285,40 @@ Mohon diproses ya! Terima kasih.`;
                             onChange={e => setFormData({ ...formData, paymentMethod: e.target.value })}
                             style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '1rem' }}
                         >
-                            <option value="Transfer Bank">Transfer Bank (BCA/Mandiri)</option>
-                            <option value="QRIS">QRIS</option>
-                            <option value="Tunai">Tunai / Bayar di Resto</option>
+                            {(storeProfile?.paymentMethods || ['Tunai', 'Transfer Bank', 'QRIS']).map(method => (
+                                <option key={method} value={method}>{method}</option>
+                            ))}
                         </select>
                     </div>
 
-                    {/* Bank Info Display - Explicit Check */}
+                    {/* Bank Info & QRIS Display */}
                     {(formData.paymentMethod === 'Transfer Bank' || formData.paymentMethod === 'QRIS') && (
                         <div style={{ background: '#e3f2fd', padding: '16px', borderRadius: '8px', border: '1px solid #90caf9' }}>
                             <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', color: '#0d47a1', fontSize: '1.05rem' }}>💳 Info Pembayaran:</p>
-                            <div style={{ fontSize: '1rem', color: '#333' }}>
-                                {storeProfile && storeProfile.bankAccount ? storeProfile.bankAccount : 'Mohon hubungi admin untuk nomor rekening.'}
-                            </div>
+
+                            {formData.paymentMethod === 'Transfer Bank' && (
+                                <div style={{ fontSize: '1rem', color: '#333', marginBottom: storeProfile?.qrisImage ? '12px' : '0' }}>
+                                    <p style={{ margin: '0 0 4px 0', fontSize: '0.9rem', color: '#666' }}>Tujuan Transfer:</p>
+                                    <strong>{storeProfile?.bankAccount || 'Hubungi admin.'}</strong>
+                                </div>
+                            )}
+
+                            {formData.paymentMethod === 'QRIS' && (
+                                <div style={{ textAlign: 'center' }}>
+                                    {storeProfile?.qrisImage ? (
+                                        <>
+                                            <p style={{ margin: '0 0 8px 0', fontSize: '0.9rem' }}>Silakan scan QRIS di bawah ini:</p>
+                                            <img
+                                                src={storeProfile.qrisImage}
+                                                alt="Store QRIS"
+                                                style={{ width: '100%', maxWidth: '250px', borderRadius: '8px', border: '1px solid #ddd', padding: '10px', background: 'white' }}
+                                            />
+                                        </>
+                                    ) : (
+                                        <p style={{ fontStyle: 'italic', color: '#666' }}>QRIS belum tersedia. Gunakan metode lainnya.</p>
+                                    )}
+                                </div>
+                            )}
                         </div>
                     )}
 

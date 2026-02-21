@@ -8,12 +8,23 @@ interface StoreProfileModalProps {
     onClose: () => void;
 }
 
+const defaultProfile = {
+    id: '',
+    storeName: '',
+    ownerName: '',
+    address: '',
+    whatsapp: '',
+    bankAccount: '',
+    qrisImage: null as string | null,
+    paymentMethods: ['Tunai'] as string[],
+};
+
 export default function StoreProfileModal({ isOpen, onClose }: StoreProfileModalProps) {
     const { storeProfile, updateProfile } = useAuth();
-    const [formData, setFormData] = useState(storeProfile);
+    const [formData, setFormData] = useState(storeProfile || defaultProfile);
 
     useEffect(() => {
-        if (isOpen) {
+        if (isOpen && storeProfile) {
             setFormData(storeProfile);
         }
     }, [isOpen, storeProfile]);
@@ -22,9 +33,11 @@ export default function StoreProfileModal({ isOpen, onClose }: StoreProfileModal
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        updateProfile(formData);
-        onClose();
-        alert('Profil toko berhasil diperbarui!');
+        if (formData) {
+            updateProfile(formData);
+            onClose();
+            alert('Profil toko berhasil diperbarui!');
+        }
     };
 
     return (
@@ -90,6 +103,75 @@ export default function StoreProfileModal({ isOpen, onClose }: StoreProfileModal
                             style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid #ccc', minHeight: '80px' }}
                             placeholder="Nomor rekening bank, e-wallet, dll"
                         />
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>QRIS (Upload Gambar Baru)</label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                    const reader = new FileReader();
+                                    reader.onload = (event) => {
+                                        const img = new Image();
+                                        img.onload = () => {
+                                            const canvas = document.createElement('canvas');
+                                            let width = img.width;
+                                            let height = img.height;
+                                            const MAX_DIM = 800;
+                                            if (width > height) {
+                                                if (width > MAX_DIM) {
+                                                    height *= MAX_DIM / width;
+                                                    width = MAX_DIM;
+                                                }
+                                            } else {
+                                                if (height > MAX_DIM) {
+                                                    width *= MAX_DIM / height;
+                                                    height = MAX_DIM;
+                                                }
+                                            }
+                                            canvas.width = width;
+                                            canvas.height = height;
+                                            const ctx = canvas.getContext('2d');
+                                            ctx?.drawImage(img, 0, 0, width, height);
+                                            setFormData({ ...formData, qrisImage: canvas.toDataURL('image/jpeg', 0.7) });
+                                        };
+                                        img.src = event.target?.result as string;
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            }}
+                            style={{ fontSize: '0.9rem' }}
+                        />
+                        {formData.qrisImage && (
+                            <div style={{ marginTop: '0.5rem' }}>
+                                <img src={formData.qrisImage} alt="QRIS" style={{ height: '100px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                            </div>
+                        )}
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500 }}>Metode Pembayaran:</label>
+                        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                            {['Tunai', 'Transfer Bank', 'QRIS'].map(method => (
+                                <label key={method} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer' }}>
+                                    <input
+                                        type="checkbox"
+                                        checked={formData.paymentMethods?.includes(method) || false}
+                                        onChange={() => {
+                                            const current = formData.paymentMethods || [];
+                                            const updated = current.includes(method)
+                                                ? current.filter(m => m !== method)
+                                                : [...current, method];
+                                            setFormData({ ...formData, paymentMethods: updated });
+                                        }}
+                                    />
+                                    {method}
+                                </label>
+                            ))}
+                        </div>
                     </div>
 
                     <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>

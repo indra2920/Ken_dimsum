@@ -9,9 +9,15 @@ export async function PUT(
     try {
         const { id } = await params;
         const body = await request.json();
+        const { storeId, status } = body;
+
+        if (!storeId) {
+            return NextResponse.json({ error: 'Store ID is required' }, { status: 400 });
+        }
+
         const order = await prisma.order.update({
-            where: { id },
-            data: { status: body.status },
+            where: { id, storeId },
+            data: { status: status },
         });
         return NextResponse.json(order);
     } catch (error) {

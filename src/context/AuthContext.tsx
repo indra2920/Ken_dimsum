@@ -1,21 +1,34 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 interface StoreProfile {
+    id: string;
     storeName: string;
     ownerName: string;
     address: string;
     whatsapp: string;
     bankAccount: string;
+    qrisImage?: string | null;
+    paymentMethods?: string[];
 }
 
 interface AuthContextType {
     isLoggedIn: boolean;
     isLoadingSettings: boolean;
-    storeProfile: StoreProfile;
+    storeProfile: StoreProfile | null;
     login: (storeName: string, password: string) => Promise<boolean>;
-    register: (password: string, storeName: string, ownerName: string) => Promise<void>;
+    register: (data: {
+        password: string;
+        storeName: string;
+        ownerName: string;
+        address: string;
+        whatsapp: string;
+        bankAccount: string;
+        qrisImage?: string;
+        paymentMethods?: string[];
+    }) => Promise<void>;
     updateProfile: (data: Partial<StoreProfile>) => Promise<void>;
     logout: () => void;
 }
@@ -25,73 +38,83 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [isLoadingSettings, setIsLoadingSettings] = useState(true);
-    const [dbPassword, setDbPassword] = useState('admin123');
-    const [storeProfile, setStoreProfile] = useState<StoreProfile>({
-        storeName: 'Ken Dimsum',
-        ownerName: 'Owner',
-        address: 'Jl. Contoh No. 123',
-        whatsapp: '6281234567890',
-        bankAccount: 'BCA 1234567890 a.n Ken Dimsum',
-    });
+    const [storeProfile, setStoreProfile] = useState<StoreProfile | null>(null);
+    const searchParams = useSearchParams();
 
-    // Load settings and session from DB/localStorage on mount
+    // Detect storeId from URL or session
     useEffect(() => {
-        // Recovery login session
+        const urlStoreId = searchParams.get('storeId');
         const savedLogin = localStorage.getItem('isLoggedIn');
-        if (savedLogin === 'true') {
-            setIsLoggedIn(true);
-        }
+        const savedStoreId = localStorage.getItem('storeId');
 
-        const fetchSettings = async (retries = 3) => {
-            for (let attempt = 1; attempt <= retries; attempt++) {
-                try {
-                    const res = await fetch('/api/settings');
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    const data = await res.json();
-                    setDbPassword(data.password);
-                    setStoreProfile({
-                        storeName: data.storeName,
-                        ownerName: data.ownerName,
-                        address: data.address,
-                        whatsapp: data.whatsapp,
-                        bankAccount: data.bankAccount,
-                    });
-                    setIsLoadingSettings(false);
-                    return; // success
-                } catch (error) {
-                    console.warn(`Settings fetch attempt ${attempt} failed:`, error);
-                    if (attempt < retries) {
-                        await new Promise(r => setTimeout(r, 2000 * attempt)); // wait 2s, 4s
-                    } else {
-                        console.error('Failed to load settings after retries. Using defaults.');
-                        setIsLoadingSettings(false);
-                    }
+        const activeStoreId = urlStoreId || savedStoreId;
+
+        const fetchStore = async (sid: string) => {
+            try {
+                const res = await fetch(`/api/settings?storeId=${sid}`);
+                if (!res.ok) throw new Error('Failed to fetch store settings');
+                const data = await res.json();
+                setStoreProfile(data);
+
+                // If it matches session, keep logged in
+                if (savedLogin === 'true' && sid === savedStoreId) {
+                    setIsLoggedIn(true);
                 }
+            } catch (error) {
+                console.error('Store fetch failed:', error);
+                if (sid === savedStoreId) {
+                    localStorage.removeItem('isLoggedIn');
+                    localStorage.removeItem('storeId');
+                }
+            } finally {
+                setIsLoadingSettings(false);
             }
         };
-        fetchSettings();
-    }, []);
+
+        if (activeStoreId) {
+            fetchStore(activeStoreId);
+        } else {
+            setIsLoadingSettings(false);
+        }
+    }, [searchParams]);
 
     const login = async (storeName: string, password: string): Promise<boolean> => {
-        // Normalize for comparison: lowercase and trimmed
-        const normalizedInputName = storeName.toLowerCase().trim();
-        const normalizedStoreName = storeProfile.storeName.toLowerCase().trim();
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ storeName, password }),
+            });
 
-        if (normalizedInputName === normalizedStoreName && password === dbPassword) {
+            if (!res.ok) return false;
+
+            const store = await res.json();
+            setStoreProfile(store);
             setIsLoggedIn(true);
             localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('storeId', store.id);
             return true;
+        } catch (error) {
+            console.error('Login error:', error);
+            return false;
         }
-        return false;
     };
 
-    const register = async (password: string, storeName: string, ownerName: string) => {
+    const register = async (data: {
+        password: string;
+        storeName: string;
+        ownerName: string;
+        address: string;
+        whatsapp: string;
+        bankAccount: string;
+        qrisImage?: string;
+        paymentMethods?: string[];
+    }) => {
         try {
-            const newProfile = { ...storeProfile, storeName, ownerName };
-            const res = await fetch('/api/settings', {
-                method: 'PUT',
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...newProfile, password }),
+                body: JSON.stringify(data),
             });
 
             if (!res.ok) {
@@ -99,34 +122,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 throw new Error(errorData.error || 'Failed to register store');
             }
 
-            setDbPassword(password);
-            setStoreProfile(newProfile);
+            const store = await res.json();
+            setStoreProfile(store);
             setIsLoggedIn(true);
             localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('storeId', store.id);
         } catch (error) {
             console.error('Registration error:', error);
-            alert('Gagal mendaftarkan toko. Silakan coba lagi.');
+            alert('Gagal mendaftarkan toko: ' + (error as Error).message);
             throw error;
         }
     };
 
     const updateProfile = async (data: Partial<StoreProfile>) => {
-        const updated = { ...storeProfile, ...data };
-        setStoreProfile(updated);
-        await fetch('/api/settings', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...updated, password: dbPassword }),
-        });
+        if (!storeProfile) return;
+        try {
+            const updated = { ...storeProfile, ...data };
+            const res = await fetch('/api/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...updated, storeId: storeProfile.id }),
+            });
+            if (res.ok) {
+                setStoreProfile(updated);
+            }
+        } catch (error) {
+            console.error('Update profile error:', error);
+        }
     };
 
     const logout = () => {
         setIsLoggedIn(false);
+        setStoreProfile(null);
         localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('storeId');
     };
 
     return (
-        <AuthContext.Provider value={{ isLoggedIn, isLoadingSettings, storeProfile, login, logout, register, updateProfile }}>
+        <AuthContext.Provider value={{
+            isLoggedIn,
+            isLoadingSettings,
+            storeProfile,
+            login,
+            logout,
+            register,
+            updateProfile
+        }}>
             {children}
         </AuthContext.Provider>
     );
