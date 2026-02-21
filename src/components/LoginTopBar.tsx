@@ -20,9 +20,10 @@ export default function LoginTopBar() {
     const [regOwnerName, setRegOwnerName] = useState('');
     const [regPassword, setRegPassword] = useState('');
 
-    const handleLogin = (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (login(loginPassword)) {
+        const success = await login(loginPassword);
+        if (success) {
             setShowLoginModal(false);
             setLoginPassword('');
             setLoginError('');
@@ -37,7 +38,7 @@ export default function LoginTopBar() {
             alert('Password minimal 5 karakter!');
             return;
         }
-        register(regPassword);
+        register(regPassword, regStoreName, regOwnerName);
         setShowRegisterModal(false);
         alert(`Selamat bergabung, ${regOwnerName}! Toko "${regStoreName}" berhasil didaftarkan.`);
     };
