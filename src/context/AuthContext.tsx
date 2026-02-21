@@ -34,8 +34,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         bankAccount: 'BCA 1234567890 a.n Ken Dimsum',
     });
 
-    // Load settings from DB on mount (with retry for Neon cold start)
+    // Load settings and session from DB/localStorage on mount
     useEffect(() => {
+        // Recovery login session
+        const savedLogin = localStorage.getItem('isLoggedIn');
+        if (savedLogin === 'true') {
+            setIsLoggedIn(true);
+        }
+
         const fetchSettings = async (retries = 3) => {
             for (let attempt = 1; attempt <= retries; attempt++) {
                 try {
@@ -64,27 +70,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             }
         };
         fetchSettings();
-
     }, []);
 
     const login = async (storeName: string, password: string): Promise<boolean> => {
-        if (storeName === storeProfile.storeName && password === dbPassword) {
+        // Normalize for comparison: lowercase and trimmed
+        const normalizedInputName = storeName.toLowerCase().trim();
+        const normalizedStoreName = storeProfile.storeName.toLowerCase().trim();
+
+        if (normalizedInputName === normalizedStoreName && password === dbPassword) {
             setIsLoggedIn(true);
+            localStorage.setItem('isLoggedIn', 'true');
             return true;
         }
         return false;
     };
 
     const register = async (password: string, storeName: string, ownerName: string) => {
-        const newProfile = { ...storeProfile, storeName, ownerName };
-        await fetch('/api/settings', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...newProfile, password }),
-        });
-        setDbPassword(password);
-        setStoreProfile(newProfile);
-        setIsLoggedIn(true);
+        try {
+            const newProfile = { ...storeProfile, storeName, ownerName };
+            const res = await fetch('/api/settings', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...newProfile, password }),
+            });
+
+            if (!res.ok) {
+                const errorData = await res.json();
+                throw new Error(errorData.error || 'Failed to register store');
+            }
+
+            setDbPassword(password);
+            setStoreProfile(newProfile);
+            setIsLoggedIn(true);
+            localStorage.setItem('isLoggedIn', 'true');
+        } catch (error) {
+            console.error('Registration error:', error);
+            alert('Gagal mendaftarkan toko. Silakan coba lagi.');
+            throw error;
+        }
     };
 
     const updateProfile = async (data: Partial<StoreProfile>) => {
@@ -99,6 +122,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const logout = () => {
         setIsLoggedIn(false);
+        localStorage.removeItem('isLoggedIn');
     };
 
     return (
