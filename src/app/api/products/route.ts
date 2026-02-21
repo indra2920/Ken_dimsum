@@ -13,19 +13,22 @@ export async function GET(request: Request) {
         if (storeId) {
             products = await prisma.product.findMany({
                 where: { storeId },
-                include: { store: { select: { storeName: true } } }
+                include: { store: { select: { storeName: true, bankAccount: true, qrisImage: true, paymentMethods: true } } }
             });
         } else {
             // Aggregator mode: fetch all products from all stores
             products = await prisma.product.findMany({
-                include: { store: { select: { storeName: true } } }
+                include: { store: { select: { storeName: true, bankAccount: true, qrisImage: true, paymentMethods: true } } }
             });
         }
 
-        // Flatten storeName into product object for easier frontend use
+        // Flatten store details into product object for easier frontend use
         const formattedProducts = products.map((p: any) => ({
             ...p,
-            storeName: p.store.storeName
+            storeName: p.store.storeName,
+            bankAccount: p.store.bankAccount,
+            qrisImage: p.store.qrisImage,
+            paymentMethods: p.store.paymentMethods
         }));
 
         return NextResponse.json(formattedProducts);

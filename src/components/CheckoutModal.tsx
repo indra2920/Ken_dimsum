@@ -31,6 +31,15 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, total, onCle
 
     const [paymentProof, setPaymentProof] = useState<string>('');
 
+    // Pre-calculate items by store for rendering payment info
+    const itemsByStore: Record<string, CartItem[]> = {};
+    cartItems.forEach(item => {
+        if (!itemsByStore[item.storeId]) {
+            itemsByStore[item.storeId] = [];
+        }
+        itemsByStore[item.storeId].push(item);
+    });
+
     if (!isOpen) return null;
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -319,34 +328,47 @@ Mohon diproses ya! Terima kasih.`;
                         </select>
                     </div>
 
-                    {/* Bank Info & QRIS Display */}
+                    {/* Bank Info & QRIS Display per Store */}
                     {(formData.paymentMethod === 'Transfer Bank' || formData.paymentMethod === 'QRIS') && (
-                        <div style={{ background: '#e3f2fd', padding: '16px', borderRadius: '8px', border: '1px solid #90caf9' }}>
-                            <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', color: '#0d47a1', fontSize: '1.05rem' }}>💳 Info Pembayaran:</p>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                            {Object.keys(itemsByStore).map(sId => {
+                                const storeItems = itemsByStore[sId];
+                                const storeName = storeItems[0].storeName || 'Toko';
+                                const bankAccount = storeItems[0].bankAccount;
+                                const qrisImage = storeItems[0].qrisImage;
 
-                            {formData.paymentMethod === 'Transfer Bank' && (
-                                <div style={{ fontSize: '1rem', color: '#333', marginBottom: storeProfile?.qrisImage ? '12px' : '0' }}>
-                                    <p style={{ margin: '0 0 4px 0', fontSize: '0.9rem', color: '#666' }}>Tujuan Transfer:</p>
-                                    <strong>{storeProfile?.bankAccount || 'Hubungi admin.'}</strong>
-                                </div>
-                            )}
+                                return (
+                                    <div key={sId} style={{ background: '#e3f2fd', padding: '16px', borderRadius: '8px', border: '1px solid #90caf9' }}>
+                                        <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', color: '#0d47a1', fontSize: '1.05rem' }}>
+                                            💳 Info Pembayaran untuk {storeName}:
+                                        </p>
 
-                            {formData.paymentMethod === 'QRIS' && (
-                                <div style={{ textAlign: 'center' }}>
-                                    {storeProfile?.qrisImage ? (
-                                        <>
-                                            <p style={{ margin: '0 0 8px 0', fontSize: '0.9rem' }}>Silakan scan QRIS di bawah ini:</p>
-                                            <img
-                                                src={storeProfile.qrisImage}
-                                                alt="Store QRIS"
-                                                style={{ width: '100%', maxWidth: '250px', borderRadius: '8px', border: '1px solid #ddd', padding: '10px', background: 'white' }}
-                                            />
-                                        </>
-                                    ) : (
-                                        <p style={{ fontStyle: 'italic', color: '#666' }}>QRIS belum tersedia. Gunakan metode lainnya.</p>
-                                    )}
-                                </div>
-                            )}
+                                        {formData.paymentMethod === 'Transfer Bank' && (
+                                            <div style={{ fontSize: '1rem', color: '#333' }}>
+                                                <p style={{ margin: '0 0 4px 0', fontSize: '0.9rem', color: '#666' }}>Tujuan Transfer:</p>
+                                                <strong>{bankAccount || 'Hubungi admin.'}</strong>
+                                            </div>
+                                        )}
+
+                                        {formData.paymentMethod === 'QRIS' && (
+                                            <div style={{ textAlign: 'center' }}>
+                                                {qrisImage ? (
+                                                    <>
+                                                        <p style={{ margin: '0 0 8px 0', fontSize: '0.9rem' }}>Silakan scan QRIS di bawah ini:</p>
+                                                        <img
+                                                            src={qrisImage}
+                                                            alt={`QRIS ${storeName}`}
+                                                            style={{ width: '100%', maxWidth: '250px', borderRadius: '8px', border: '1px solid #ddd', padding: '10px', background: 'white' }}
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    <p style={{ fontStyle: 'italic', color: '#666' }}>QRIS belum tersedia untuk {storeName}.</p>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
 

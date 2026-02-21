@@ -13,6 +13,9 @@ export interface Product {
     stock: number;
     storeId: string;
     storeName?: string;
+    bankAccount?: string;
+    qrisImage?: string;
+    paymentMethods?: string[];
 }
 
 interface ProductContextType {
