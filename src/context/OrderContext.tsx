@@ -58,6 +58,38 @@ export function OrderProvider({ children }: { children: ReactNode }) {
                 const newOrders = data.filter(o => !knownOrderIds.current.has(o.id) && o.status === 'BARU');
                 if (newOrders.length > 0) {
                     setNewOrderAlert(newOrders[0]);
+
+                    // Simple notification sound using Web Audio API
+                    const playNotificationSound = () => {
+                        try {
+                            const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+                            const oscillator = audioCtx.createOscillator();
+                            const gainNode = audioCtx.createGain();
+
+                            oscillator.connect(gainNode);
+                            gainNode.connect(audioCtx.destination);
+
+                            oscillator.type = 'sine';
+                            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+                            oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.5); // A4
+
+                            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+
+                            oscillator.start();
+                            oscillator.stop(audioCtx.currentTime + 0.5);
+                        } catch (err) {
+                            console.warn('Could not play notification sound:', err);
+                        }
+                    };
+
+                    playNotificationSound();
+
+                    // Vibration for mobile/tablet
+                    if (typeof window !== 'undefined' && window.navigator && window.navigator.vibrate) {
+                        window.navigator.vibrate([200, 100, 200]); // Vibrate pattern
+                    }
+
                     console.log('DING! New Order:', newOrders[0].customerName);
                 }
             }

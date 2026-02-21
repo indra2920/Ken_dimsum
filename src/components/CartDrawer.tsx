@@ -24,7 +24,7 @@ export default function CartDrawer({ isOpen, onClose, cartItems, onUpdateQuantit
             right: 0,
             bottom: 0,
             width: '100%',
-            maxWidth: '400px',
+            maxWidth: 'min(400px, 100vw)',
             background: 'var(--background-color)',
             boxShadow: '-4px 0 20px rgba(0,0,0,0.1)',
             transform: isOpen ? 'translateX(0)' : 'translateX(100%)',

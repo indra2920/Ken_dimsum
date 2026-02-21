@@ -73,27 +73,33 @@ export default function Home() {
       <section style={{
         background: 'linear-gradient(135deg, var(--primary-color) 0%, #2D0A0A 100%)',
         color: 'white',
-        padding: '60px 0',
-        marginBottom: '40px',
+        padding: 'clamp(32px, 6vw, 60px) 0',
+        marginBottom: '32px',
         boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
       }}>
-        <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ maxWidth: '600px' }}>
+        <div className="container" style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: '16px'
+        }}>
+          <div style={{ flex: '1', minWidth: '260px' }}>
             <span style={{
               display: 'inline-block',
               background: 'rgba(255,255,255,0.1)',
-              padding: '8px 16px',
+              padding: '6px 14px',
               borderRadius: '50px',
-              fontSize: '0.9rem',
-              marginBottom: '16px',
+              fontSize: '0.85rem',
+              marginBottom: '12px',
               backdropFilter: 'blur(10px)',
               border: '1px solid rgba(255,255,255,0.2)'
             }}>
               ✨ Cita Rasa Otentik
             </span>
             <h1 style={{
-              fontSize: '3.5rem',
-              marginBottom: '16px',
+              fontSize: 'clamp(2rem, 6vw, 3.5rem)',
+              marginBottom: '12px',
               lineHeight: '1.2',
               color: 'white',
               textShadow: '0 2px 4px rgba(0,0,0,0.3)'
@@ -101,15 +107,15 @@ export default function Home() {
               Ken Dimsum
             </h1>
             <p style={{
-              fontSize: '1.25rem',
+              fontSize: 'clamp(0.95rem, 2.5vw, 1.2rem)',
               opacity: 0.9,
-              marginBottom: '32px',
+              marginBottom: '24px',
               fontWeight: 300,
               maxWidth: '480px'
             }}>
               Dibuat dengan bahan pilihan dan resep warisan untuk pengalaman dimsum terbaik.
             </p>
-            <div style={{ display: 'flex', gap: '16px' }}>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               <button
                 className="btn"
                 onClick={() => document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth' })}
@@ -117,8 +123,8 @@ export default function Home() {
                   background: 'var(--secondary-color)',
                   color: 'white',
                   border: 'none',
-                  padding: '12px 32px',
-                  fontSize: '1rem',
+                  padding: '12px 28px',
+                  fontSize: '0.95rem',
                   boxShadow: '0 4px 12px rgba(212, 175, 55, 0.3)'
                 }}
               >
@@ -126,67 +132,74 @@ export default function Home() {
               </button>
             </div>
           </div>
-          <div style={{ fontSize: '8rem', filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.4))', animation: 'float 6s ease-in-out infinite' }}>
+          <div style={{ fontSize: 'clamp(4rem, 12vw, 8rem)', filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.4))' }}>
             🥟
           </div>
         </div>
       </section>
 
-      <div className="container" style={{ paddingBottom: '60px', flex: 1 }}>
+      <div className="container" style={{ paddingBottom: '80px', flex: 1 }}>
         <header style={{
           display: 'flex',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           alignItems: 'center',
-          marginBottom: '32px',
+          marginBottom: '24px',
+          paddingTop: '16px',
         }}>
-          <nav style={{ width: '100%', display: 'flex', justifyContent: 'flex-end' }}>
-            <button
-              className="btn btn-primary"
-              style={{ position: 'relative' }}
-              onClick={() => setIsCartOpen(true)}
-            >
-              🛒 Keranjang
-              {cartTotalItems > 0 && (
-                <span style={{
-                  position: 'absolute',
-                  top: '-8px',
-                  right: '-8px',
-                  background: 'var(--secondary-color)',
-                  color: 'var(--text-primary)',
-                  borderRadius: '50%',
-                  width: '24px',
-                  height: '24px',
-                  fontSize: '0.8rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  border: '2px solid white',
-                  fontWeight: 'bold'
-                }}>
-                  {cartTotalItems}
-                </span>
-              )}
-            </button>
-          </nav>
+          <button
+            className="btn btn-primary"
+            style={{ position: 'relative' }}
+            onClick={() => setIsCartOpen(true)}
+          >
+            🛒 Keranjang
+            {cartTotalItems > 0 && (
+              <span style={{
+                position: 'absolute',
+                top: '-8px',
+                right: '-8px',
+                background: 'var(--secondary-color)',
+                color: 'var(--text-primary)',
+                borderRadius: '50%',
+                width: '24px',
+                height: '24px',
+                fontSize: '0.8rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                border: '2px solid white',
+                fontWeight: 'bold'
+              }}>
+                {cartTotalItems}
+              </span>
+            )}
+          </button>
         </header>
 
         <main>
           <section id="menu">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-              <div>
-                <h2 style={{ fontSize: '2.5rem', marginBottom: '8px' }}>Menu Andalan</h2>
+            <div style={{ marginBottom: '24px' }}>
+              <div style={{ marginBottom: '16px' }}>
+                <h2 style={{ fontSize: 'clamp(1.6rem, 5vw, 2.5rem)', marginBottom: '8px' }}>Menu Andalan</h2>
                 <div style={{ height: '4px', width: '60px', background: 'var(--secondary-color)', borderRadius: '2px' }}></div>
               </div>
-
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <div style={{
+                display: 'flex',
+                gap: '10px',
+                overflowX: 'auto',
+                paddingBottom: '6px',
+                WebkitOverflowScrolling: 'touch' as const,
+                scrollbarWidth: 'none' as const,
+              }}>
                 {['Semua', 'Kukus', 'Goreng', 'Minuman'].map(cat => (
-                  <button key={cat} onClick={() => { /* Filter logic would go here if state was lifted */ }} className="btn" style={{
+                  <button key={cat} className="btn" style={{
                     background: cat === 'Semua' ? 'var(--primary-color)' : 'white',
                     color: cat === 'Semua' ? 'white' : 'var(--text-primary)',
                     border: cat === 'Semua' ? 'none' : '1px solid var(--border-color)',
                     boxShadow: cat === 'Semua' ? 'var(--shadow-md)' : 'none',
-                    padding: '8px 24px',
-                    borderRadius: '50px'
+                    padding: '7px 18px',
+                    borderRadius: '50px',
+                    flexShrink: 0,
+                    fontSize: '0.88rem'
                   }}>{cat}</button>
                 ))}
               </div>

@@ -44,20 +44,20 @@ export default function AdminOrdersPage() {
     };
 
     return (
-        <div className="container" style={{ padding: '2rem 0' }}>
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <div className="container" style={{ padding: 'clamp(1rem, 3vw, 2rem) 0' }}>
+            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
-                    <h1 style={{ margin: 0, fontSize: '2rem' }}>Daftar Pesanan</h1>
+                    <h1 style={{ margin: 0, fontSize: 'clamp(1.5rem, 4vw, 2rem)' }}>Daftar Pesanan</h1>
                     <p style={{ color: 'var(--text-secondary)' }}>Kelola pesanan masuk secara real-time</p>
                 </div>
-                <div style={{ display: 'flex', gap: '1rem' }}>
-                    <Link href="/admin" className="btn btn-secondary">Kelola Produk</Link>
-                    <Link href="/" className="btn btn-secondary">Ke Toko</Link>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <Link href="/admin" className="btn btn-secondary" style={{ fontSize: '0.85rem', padding: '8px 16px' }}>Kelola Produk</Link>
+                    <Link href="/" className="btn btn-secondary" style={{ fontSize: '0.85rem', padding: '8px 16px' }}>Ke Toko</Link>
                 </div>
             </header>
 
             {/* Metrics Cards */}
-            <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', marginBottom: '2rem' }}>
+            <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', marginBottom: '1.5rem' }}>
                 <div className="card" style={{ padding: '1.5rem', textAlign: 'center' }}>
                     <h3 style={{ fontSize: '2.5rem', margin: 0, color: 'var(--primary-color)' }}>
                         {orders.filter(o => o.status === 'BARU').length}

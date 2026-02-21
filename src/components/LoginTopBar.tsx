@@ -52,30 +52,31 @@ export default function LoginTopBar() {
                 fontSize: '0.85rem',
                 borderBottom: '1px solid rgba(255,255,255,0.1)'
             }}>
-                <div className="container" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
-                    <div style={{ display: 'flex', gap: '24px', alignItems: 'center' }}>
-                        <span style={{ cursor: 'pointer', transition: 'color 0.2s' }}>Bantuan</span>
-                        <span style={{ cursor: 'pointer', transition: 'color 0.2s' }}>Bahasa Indonesia</span>
-                        <div style={{ width: '1px', height: '12px', background: 'rgba(255,255,255,0.2)' }}></div>
+                <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {/* Store name / logo on left */}
+                    <span style={{ fontWeight: '700', color: 'var(--secondary-color)', letterSpacing: '0.5px' }}>
+                        🥟 Ken Dimsum
+                    </span>
+
+                    {/* Nav on right */}
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'nowrap', overflowX: 'auto' }}>
                         {isLoggedIn ? (
-                            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                                 <span
-                                    style={{ fontWeight: '600', color: 'var(--secondary-color)', cursor: 'pointer' }}
+                                    style={{ fontWeight: '600', color: 'var(--secondary-color)', cursor: 'pointer', whiteSpace: 'nowrap' }}
                                     onClick={() => setShowProfileModal(true)}
                                 >
                                     Hi, {storeProfile?.ownerName || 'Owner'}
                                 </span>
-                                <button onClick={logout} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'white', fontWeight: '500' }}>Logout</button>
-
-                                <Link href="/admin/orders" style={{ color: 'white' }}>Pesanan</Link>
-                                <Link href="/admin" style={{ color: 'white' }}>Tambah Produk</Link>
-                                <Link href="/pos" style={{ color: 'white' }}>POS</Link>
+                                <Link href="/admin/orders" style={{ color: 'white', whiteSpace: 'nowrap' }}>Pesanan</Link>
+                                <Link href="/admin" style={{ color: 'white', whiteSpace: 'nowrap' }}>Produk</Link>
+                                <Link href="/pos" style={{ color: 'white', whiteSpace: 'nowrap' }}>POS</Link>
+                                <button onClick={logout} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontWeight: '500', whiteSpace: 'nowrap' }}>Logout</button>
                             </div>
                         ) : (
-                            <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                                <span style={{ cursor: 'pointer', fontWeight: '600', color: 'white' }} onClick={() => setShowRegisterModal(true)}>Daftar Toko</span>
-                                <div style={{ width: '1px', height: '12px', background: 'rgba(255,255,255,0.2)' }}></div>
-                                <span style={{ cursor: 'pointer', fontWeight: '600', color: 'white' }} onClick={() => setShowLoginModal(true)}>Log In Toko</span>
+                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                                <span style={{ cursor: 'pointer', fontWeight: '600', color: 'white', whiteSpace: 'nowrap' }} onClick={() => setShowRegisterModal(true)}>Daftar</span>
+                                <span style={{ cursor: 'pointer', fontWeight: '600', color: 'var(--secondary-color)', whiteSpace: 'nowrap' }} onClick={() => setShowLoginModal(true)}>Login Admin</span>
                             </div>
                         )}
                     </div>

@@ -69,10 +69,10 @@ export default function AdminPage() {
     };
 
     return (
-        <div className="container" style={{ padding: '2rem' }}>
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-                <h1>Inventory Management</h1>
-                <Link href="/" className="btn btn-secondary">Back to Store</Link>
+        <div className="container" style={{ padding: 'clamp(1rem, 3vw, 2rem)' }}>
+            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '12px' }}>
+                <h1 style={{ fontSize: 'clamp(1.4rem, 4vw, 2rem)' }}>Inventory Management</h1>
+                <Link href="/" className="btn btn-secondary" style={{ fontSize: '0.85rem', padding: '8px 16px' }}>Back to Store</Link>
             </header>
 
             <div className="card">
@@ -81,72 +81,74 @@ export default function AdminPage() {
                     <button className="btn btn-primary" onClick={handleOpenAdd}>+ Add Product</button>
                 </div>
 
-                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                    <thead>
-                        <tr style={{ textAlign: 'left', borderBottom: '2px solid #eee' }}>
-                            <th style={{ padding: '1rem' }}>ID</th>
-                            <th style={{ padding: '1rem' }}>Product Name</th>
-                            <th style={{ padding: '1rem' }}>Category</th>
-                            <th style={{ padding: '1rem' }}>Price</th>
-                            <th style={{ padding: '1rem' }}>Stock</th>
-                            <th style={{ padding: '1rem' }}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {products.map(product => (
-                            <tr key={product.id} style={{ borderBottom: '1px solid #eee' }}>
-                                <td style={{ padding: '1rem' }}>#{product.id}</td>
-                                <td style={{ padding: '1rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                    <div style={{
-                                        width: '48px', height: '48px',
-                                        background: '#f5f5f5',
-                                        borderRadius: '8px',
-                                        overflow: 'hidden',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center'
-                                    }}>
-                                        {product.image.startsWith('data:') || product.image.startsWith('http') ? (
-                                            <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                        ) : (
-                                            <span style={{ fontSize: '1.5rem' }}>{product.image}</span>
-                                        )}
-                                    </div>
-                                    {product.name}
-                                </td>
-                                <td style={{ padding: '1rem' }}>
-                                    <span style={{
-                                        padding: '0.25rem 0.75rem',
-                                        background: product.category === 'Steamed' ? '#e3f2fd' : product.category === 'Fried' ? '#fff3e0' : '#f5f5f5',
-                                        color: product.category === 'Steamed' ? '#1565c0' : product.category === 'Fried' ? '#ef6c00' : '#616161',
-                                        borderRadius: '20px',
-                                        fontSize: '0.85rem'
-                                    }}>
-                                        {product.category}
-                                    </span>
-                                </td>
-                                <td style={{ padding: '1rem' }}>Rp {product.price.toLocaleString()}</td>
-                                <td style={{ padding: '1rem' }}>
-                                    <span style={{ color: product.stock < 10 ? 'red' : 'inherit', fontWeight: product.stock < 10 ? 'bold' : 'normal' }}>
-                                        {product.stock}
-                                    </span>
-                                </td>
-                                <td style={{ padding: '1rem' }}>
-                                    <button
-                                        style={{ color: 'blue', marginRight: '1rem', background: 'none', border: 'none', cursor: 'pointer' }}
-                                        onClick={() => handleOpenEdit(product)}
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}
-                                        onClick={() => handleDelete(product.id)}
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
+                <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' as any }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '560px' }}>
+                        <thead>
+                            <tr style={{ textAlign: 'left', borderBottom: '2px solid #eee' }}>
+                                <th style={{ padding: '1rem' }}>ID</th>
+                                <th style={{ padding: '1rem' }}>Product Name</th>
+                                <th style={{ padding: '1rem' }}>Category</th>
+                                <th style={{ padding: '1rem' }}>Price</th>
+                                <th style={{ padding: '1rem' }}>Stock</th>
+                                <th style={{ padding: '1rem' }}>Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {products.map(product => (
+                                <tr key={product.id} style={{ borderBottom: '1px solid #eee' }}>
+                                    <td style={{ padding: '1rem' }}>#{product.id}</td>
+                                    <td style={{ padding: '1rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                        <div style={{
+                                            width: '48px', height: '48px',
+                                            background: '#f5f5f5',
+                                            borderRadius: '8px',
+                                            overflow: 'hidden',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center'
+                                        }}>
+                                            {product.image.startsWith('data:') || product.image.startsWith('http') ? (
+                                                <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                            ) : (
+                                                <span style={{ fontSize: '1.5rem' }}>{product.image}</span>
+                                            )}
+                                        </div>
+                                        {product.name}
+                                    </td>
+                                    <td style={{ padding: '1rem' }}>
+                                        <span style={{
+                                            padding: '0.25rem 0.75rem',
+                                            background: product.category === 'Steamed' ? '#e3f2fd' : product.category === 'Fried' ? '#fff3e0' : '#f5f5f5',
+                                            color: product.category === 'Steamed' ? '#1565c0' : product.category === 'Fried' ? '#ef6c00' : '#616161',
+                                            borderRadius: '20px',
+                                            fontSize: '0.85rem'
+                                        }}>
+                                            {product.category}
+                                        </span>
+                                    </td>
+                                    <td style={{ padding: '1rem' }}>Rp {product.price.toLocaleString()}</td>
+                                    <td style={{ padding: '1rem' }}>
+                                        <span style={{ color: product.stock < 10 ? 'red' : 'inherit', fontWeight: product.stock < 10 ? 'bold' : 'normal' }}>
+                                            {product.stock}
+                                        </span>
+                                    </td>
+                                    <td style={{ padding: '1rem' }}>
+                                        <button
+                                            style={{ color: 'blue', marginRight: '1rem', background: 'none', border: 'none', cursor: 'pointer' }}
+                                            onClick={() => handleOpenEdit(product)}
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            style={{ color: 'red', background: 'none', border: 'none', cursor: 'pointer' }}
+                                            onClick={() => handleDelete(product.id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {/* Modal */}
@@ -160,7 +162,7 @@ export default function AdminPage() {
                     justifyContent: 'center',
                     zIndex: 1000
                 }}>
-                    <div className="card" style={{ width: '500px', padding: '2rem' }}>
+                    <div className="card" style={{ width: '95%', maxWidth: '500px', padding: 'clamp(1rem, 4vw, 2rem)', maxHeight: '90vh', overflowY: 'auto' }}>
                         <h2 style={{ marginBottom: '1.5rem' }}>{editingProduct ? 'Edit Product' : 'Add Product'}</h2>
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <div>

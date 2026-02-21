@@ -1,30 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
 :root {
-  /* Brand Colors */
   --primary-color: #9A1F1F;
-  /* Rich Maroon */
   --primary-light: #C23B3B;
   --secondary-color: #D4AF37;
-  /* Elegant Gold */
   --secondary-light: #F4D06F;
-
-  /* Backgrounds */
   --background-color: #FFFCF5;
-  /* Warm Cream */
   --surface-color: #FFFFFF;
   --surface-hover: #FFF5F5;
-
-  /* Text */
   --text-primary: #2D2424;
   --text-secondary: #665A5A;
   --text-light: #998E8E;
-
-  /* UI Elements */
   --border-color: #EFE5E5;
   --divider-color: #E0D0D0;
-
-  /* Spacing & Layout */
   --border-radius-sm: 8px;
   --border-radius-md: 16px;
   --border-radius-lg: 24px;
@@ -123,14 +111,9 @@ button {
   gap: 24px;
 }
 
+/* Product grid - mobile first */
 .product-grid {
-  grid-template-columns: repeat(1, 1fr);
-}
-
-@media (min-width: 640px) {
-  .product-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  grid-template-columns: repeat(2, 1fr);
 }
 
 @media (min-width: 768px) {
@@ -142,5 +125,34 @@ button {
 @media (min-width: 1024px) {
   .product-grid {
     grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ==============================
+   MOBILE RESPONSIVE
+   ============================== */
+
+@media (max-width: 768px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  .grid {
+    gap: 16px;
+  }
+
+  .btn {
+    padding: 9px 18px;
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 0 12px;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(1, 1fr);
   }
 }
