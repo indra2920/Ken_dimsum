@@ -8,8 +8,7 @@ export async function GET() {
         const stores = await prisma.store.findMany({
             select: {
                 storeName: true,
-                ownerName: true,
-                createdAt: true
+                ownerName: true
             }
         });
         return NextResponse.json(stores);
