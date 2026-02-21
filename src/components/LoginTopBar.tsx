@@ -111,53 +111,94 @@ export default function LoginTopBar() {
 
     return (
         <>
-            <div style={{
-                background: '#2D0A0A',
-                color: 'rgba(255,255,255,0.8)',
-                padding: '8px 0',
-                fontSize: '0.85rem',
-                borderBottom: '1px solid rgba(255,255,255,0.1)'
+            <div className="glass" style={{
+                position: 'sticky',
+                top: 0,
+                left: 0,
+                right: 0,
+                color: 'var(--text-rich)',
+                padding: '12px 0',
+                zIndex: 1000,
+                borderBottom: '1px solid var(--gold-border)',
+                boxShadow: '0 4px 20px rgba(0,0,0,0.03)'
             }}>
                 <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     {/* Store name / logo on left */}
-                    <span style={{ fontWeight: '700', color: 'var(--secondary-color)', letterSpacing: '0.5px' }}>
-                        🥟 {storeProfile?.storeName || 'Ken Dimsum'}
-                    </span>
+                    <Link href="/" style={{ textDecoration: 'none' }}>
+                        <span style={{
+                            fontWeight: '800',
+                            color: 'var(--primary-color)',
+                            letterSpacing: '1px',
+                            fontSize: '1.2rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            fontFamily: 'Playfair Display SC, serif'
+                        }}>
+                            <span style={{ fontSize: '1.5rem' }}>🥟</span> {storeProfile?.storeName || 'KEN DIMSUM'}
+                        </span>
+                    </Link>
 
                     {/* Nav on right */}
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'nowrap', overflowX: 'auto' }}>
+                    <div style={{ display: 'flex', gap: '20px', alignItems: 'center', flexWrap: 'nowrap' }}>
                         {isLoggedIn ? (
-                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                            <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
                                 <span
-                                    style={{ fontWeight: '600', color: 'var(--secondary-color)', cursor: 'pointer', whiteSpace: 'nowrap' }}
+                                    style={{
+                                        fontWeight: '600',
+                                        color: 'var(--text-gold)',
+                                        cursor: 'pointer',
+                                        whiteSpace: 'nowrap',
+                                        fontSize: '0.9rem'
+                                    }}
                                     onClick={() => setShowProfileModal(true)}
                                 >
-                                    Hi, {storeProfile?.ownerName || 'Owner'}
+                                    👑 Hi, {storeProfile?.ownerName || 'Owner'}
                                 </span>
                                 {/* Aggregator Link */}
                                 {searchParams?.get('storeId') && (
                                     <Link
                                         href="/"
-                                        style={{ color: 'white', textDecoration: 'none', fontSize: '0.85rem', background: 'rgba(255,255,255,0.1)', padding: '4px 10px', borderRadius: '4px' }}
+                                        className="btn-secondary"
+                                        style={{ padding: '6px 14px', borderRadius: '50px', fontSize: '0.8rem' }}
                                     >
                                         🏠 Semua Menu
                                     </Link>
                                 )}
-                                <span
-                                    style={{ color: 'white', cursor: 'pointer', whiteSpace: 'nowrap', fontSize: '0.85rem' }}
-                                    onClick={() => setShowProfileModal(true)}
+
+                                <div style={{ display: 'flex', gap: '15px', fontSize: '0.9rem', fontWeight: 500 }}>
+                                    <Link href="/admin/orders" style={{ color: 'var(--text-rich)', whiteSpace: 'nowrap' }}>Pesanan</Link>
+                                    <Link href="/admin" style={{ color: 'var(--text-rich)', whiteSpace: 'nowrap' }}>Produk</Link>
+                                    <Link href="/pos" style={{ color: 'var(--text-rich)', whiteSpace: 'nowrap' }}>POS</Link>
+                                </div>
+
+                                <button
+                                    onClick={logout}
+                                    style={{
+                                        background: 'rgba(128, 0, 0, 0.05)',
+                                        border: '1px solid var(--maroon-border)',
+                                        cursor: 'pointer',
+                                        color: 'var(--primary-color)',
+                                        fontWeight: '600',
+                                        whiteSpace: 'nowrap',
+                                        padding: '6px 12px',
+                                        borderRadius: '50px',
+                                        fontSize: '0.8rem'
+                                    }}
                                 >
-                                    ⚙️ Pengaturan
-                                </span>
-                                <Link href="/admin/orders" style={{ color: 'white', whiteSpace: 'nowrap' }}>Pesanan</Link>
-                                <Link href="/admin" style={{ color: 'white', whiteSpace: 'nowrap' }}>Produk</Link>
-                                <Link href="/pos" style={{ color: 'white', whiteSpace: 'nowrap' }}>POS</Link>
-                                <button onClick={logout} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#ccc', fontWeight: '500', whiteSpace: 'nowrap' }}>Logout</button>
+                                    Logout
+                                </button>
                             </div>
                         ) : (
-                            <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                                <span style={{ cursor: 'pointer', fontWeight: '600', color: 'white', whiteSpace: 'nowrap' }} onClick={() => setShowRegisterModal(true)}>Daftar</span>
-                                <span style={{ cursor: 'pointer', fontWeight: '600', color: 'var(--secondary-color)', whiteSpace: 'nowrap' }} onClick={() => setShowLoginModal(true)}>Login sebagai Pemilik Toko</span>
+                            <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                                <span style={{ cursor: 'pointer', fontWeight: '500', color: 'var(--text-muted)', fontSize: '0.9rem' }} onClick={() => setShowRegisterModal(true)}>Daftar</span>
+                                <span
+                                    className="btn btn-primary"
+                                    style={{ cursor: 'pointer', padding: '8px 18px', fontSize: '0.85rem' }}
+                                    onClick={() => setShowLoginModal(true)}
+                                >
+                                    Login Owner
+                                </span>
                             </div>
                         )}
                     </div>
@@ -169,47 +210,63 @@ export default function LoginTopBar() {
                 <div style={{
                     position: 'fixed',
                     top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    backgroundColor: 'rgba(26, 10, 10, 0.8)',
+                    backdropFilter: 'blur(8px)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     zIndex: 2000
                 }}>
-                    <div className="card" style={{ width: '350px', padding: '2rem', background: 'white', borderRadius: '8px' }}>
-                        <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Login Pemilik Toko</h2>
-                        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div className="card animate-fade-in-up" style={{ width: '400px', padding: '2.5rem', background: 'white' }}>
+                        <h2 style={{ marginBottom: '0.5rem', textAlign: 'center' }}>KEMBALI BERBISNIS</h2>
+                        <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2rem' }}>Masuk ke akun toko Anda</p>
+
+                        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem' }}>Nama Toko</label>
+                                <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-muted)' }}>NAMA TOKO</label>
                                 <input
                                     type="text"
                                     required
                                     value={loginStoreName}
                                     onChange={(e) => setLoginStoreName(e.target.value)}
-                                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
-                                    placeholder="Masukkan nama toko"
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px',
+                                        borderRadius: '12px',
+                                        border: '1px solid var(--maroon-border)',
+                                        background: 'var(--bg-creamy)',
+                                        fontSize: '1rem'
+                                    }}
+                                    placeholder="Nama toko Anda"
                                 />
                             </div>
                             <div>
-                                <label style={{ display: 'block', marginBottom: '0.5rem' }}>Password</label>
+                                <label style={{ display: 'block', marginBottom: '0.6rem', fontWeight: 600, fontSize: '0.85rem', color: 'var(--text-muted)' }}>KATASANDI</label>
                                 <input
                                     type="password"
                                     required
                                     value={loginPassword}
                                     onChange={(e) => setLoginPassword(e.target.value)}
-                                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
-                                    placeholder="Masukkan password admin"
+                                    style={{
+                                        width: '100%',
+                                        padding: '12px',
+                                        borderRadius: '12px',
+                                        border: '1px solid var(--maroon-border)',
+                                        background: 'var(--bg-creamy)',
+                                        fontSize: '1rem'
+                                    }}
+                                    placeholder="Kata sandi admin"
                                 />
                             </div>
-                            {loginError && <p style={{ color: 'red', fontSize: '0.9rem' }}>{loginError}</p>}
-                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                                <button type="submit" className="btn btn-primary" style={{ flex: 1 }}>Login</button>
+                            {loginError && <p style={{ color: 'var(--primary-color)', fontSize: '0.85rem', fontWeight: 500 }}>⚠️ {loginError}</p>}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+                                <button type="submit" className="btn btn-primary">MASUK SEKARANG</button>
                                 <button
                                     type="button"
-                                    className="btn btn-secondary"
-                                    style={{ flex: 1, background: '#eee' }}
                                     onClick={() => setShowLoginModal(false)}
+                                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontWeight: 500, fontSize: '0.9rem', cursor: 'pointer' }}
                                 >
-                                    Batal
+                                    KEMBALI
                                 </button>
                             </div>
                         </form>
@@ -222,106 +279,109 @@ export default function LoginTopBar() {
                 <div style={{
                     position: 'fixed',
                     top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.5)',
+                    backgroundColor: 'rgba(26, 10, 10, 0.8)',
+                    backdropFilter: 'blur(8px)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     zIndex: 2000,
                     padding: '20px'
                 }}>
-                    <div className="card" style={{ width: '500px', maxWidth: '100%', padding: '2rem', background: 'white', borderRadius: '12px', maxHeight: '90vh', overflowY: 'auto' }}>
-                        <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Pendaftaran Toko Baru</h2>
-                        <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div className="card animate-fade-in-up" style={{ width: '550px', maxWidth: '100%', padding: '3rem', background: 'white', maxHeight: '90vh', overflowY: 'auto' }}>
+                        <h2 style={{ marginBottom: '0.5rem', textAlign: 'center' }}>GABUNG KE DUNIA DIMSUM</h2>
+                        <p style={{ textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '2.5rem' }}>Mulai perjalanan kuliner Anda bersama kami</p>
+
+                        <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.2rem' }}>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.9rem', fontWeight: 600 }}>Nama Toko</label>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>NAMA TOKO</label>
                                     <input
                                         required
                                         type="text"
                                         value={regStoreName}
                                         onChange={(e) => setRegStoreName(e.target.value)}
-                                        style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #ddd' }}
-                                        placeholder="Contoh: Ken Dimsum Cabang 2"
+                                        style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--maroon-border)', background: 'var(--bg-creamy)' }}
+                                        placeholder="Ken Dimsum Royale"
                                     />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.9rem', fontWeight: 600 }}>Nama Pemilik</label>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>NAMA PEMILIK</label>
                                     <input
                                         required
                                         type="text"
                                         value={regOwnerName}
                                         onChange={(e) => setRegOwnerName(e.target.value)}
-                                        style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #ddd' }}
+                                        style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--maroon-border)', background: 'var(--bg-creamy)' }}
                                         placeholder="Nama Lengkap"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.9rem', fontWeight: 600 }}>Alamat Toko</label>
+                                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>ALAMAT LENGKAP</label>
                                 <textarea
                                     required
                                     value={regAddress}
                                     onChange={(e) => setRegAddress(e.target.value)}
-                                    style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #ddd', minHeight: '60px' }}
-                                    placeholder="Alamat lengkap toko fisik"
+                                    style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--maroon-border)', background: 'var(--bg-creamy)', minHeight: '80px' }}
+                                    placeholder="Alamat fisik toko Anda"
                                 />
                             </div>
 
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.2rem' }}>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.9rem', fontWeight: 600 }}>Nomor WhatsApp</label>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>WHATSAPP</label>
                                     <input
                                         required
                                         type="text"
                                         value={regWhatsapp}
                                         onChange={(e) => setRegWhatsapp(e.target.value)}
-                                        style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #ddd' }}
-                                        placeholder="Contoh: 628123456789"
+                                        style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--maroon-border)', background: 'var(--bg-creamy)' }}
+                                        placeholder="628123456789"
                                     />
                                 </div>
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.9rem', fontWeight: 600 }}>Password Admin</label>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)' }}>KATASANDI</label>
                                     <input
                                         required
                                         type="password"
                                         value={regPassword}
                                         onChange={(e) => setRegPassword(e.target.value)}
-                                        style={{ width: '100%', padding: '0.55rem', borderRadius: '6px', border: '1px solid #ddd' }}
-                                        placeholder="Password untuk login"
+                                        style={{ width: '100%', padding: '10px 14px', borderRadius: '10px', border: '1px solid var(--maroon-border)', background: 'var(--bg-creamy)' }}
+                                        placeholder="Min. 5 karakter"
                                     />
                                 </div>
                             </div>
 
-                            <div style={{ background: '#f9f9f9', padding: '1rem', borderRadius: '8px', border: '1px solid #eee' }}>
-                                <label style={{ display: 'block', marginBottom: '0.8rem', fontWeight: 600, fontSize: '0.95rem', color: 'var(--primary-color)' }}>💳 Info Pembayaran</label>
-                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                            <div style={{ background: 'rgba(212, 175, 55, 0.05)', padding: '1.5rem', borderRadius: '15px', border: '1px dashed var(--secondary-color)' }}>
+                                <label style={{ display: 'block', marginBottom: '1rem', fontWeight: 700, fontSize: '1rem', color: 'var(--primary-color)' }}>🏺 INFO PEMBAYARAN</label>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.2rem' }}>
                                     <div>
-                                        <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem' }}>Nama Bank / Dompet</label>
+                                        <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>BANK / E-WALLET</label>
                                         <input
                                             required
                                             type="text"
                                             value={regBankName}
                                             onChange={(e) => setRegBankName(e.target.value)}
-                                            style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
-                                            placeholder="BCA / Mandiri / GoPay"
+                                            style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--gold-border)', background: 'white' }}
+                                            placeholder="BCA / GoPay"
                                         />
                                     </div>
                                     <div>
-                                        <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem' }}>Nomor Rekening</label>
+                                        <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>NOMOR REKENING</label>
                                         <input
                                             required
                                             type="text"
                                             value={regBankAccount}
                                             onChange={(e) => setRegBankAccount(e.target.value)}
-                                            style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
-                                            placeholder="123-456-7890"
+                                            style={{ width: '100%', padding: '8px 12px', borderRadius: '8px', border: '1px solid var(--gold-border)', background: 'white' }}
+                                            placeholder="123-456-789"
                                         />
                                     </div>
                                 </div>
 
-                                <div style={{ marginBottom: '1rem' }}>
-                                    <label style={{ display: 'block', marginBottom: '0.4rem', fontSize: '0.85rem' }}>Upload QRIS (Opsional)</label>
+                                <div style={{ marginBottom: '1.2rem' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>UPLOAD QRIS (OPSIONAL)</label>
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -329,17 +389,17 @@ export default function LoginTopBar() {
                                         style={{ fontSize: '0.8rem' }}
                                     />
                                     {regQrisImage && (
-                                        <div style={{ marginTop: '0.5rem' }}>
-                                            <img src={regQrisImage} alt="QRIS Preview" style={{ height: '60px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                                        <div style={{ marginTop: '0.8rem' }}>
+                                            <img src={regQrisImage} alt="QRIS Preview" style={{ height: '70px', borderRadius: '4px', border: '1px solid var(--gold-border)' }} />
                                         </div>
                                     )}
                                 </div>
 
                                 <div>
-                                    <label style={{ display: 'block', marginBottom: '0.6rem', fontSize: '0.85rem' }}>Metode Pembayaran yang Diterima:</label>
+                                    <label style={{ display: 'block', marginBottom: '0.8rem', fontSize: '0.8rem', color: 'var(--text-muted)' }}>METODE DITERIMA:</label>
                                     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                                         {['Tunai', 'Transfer Bank', 'QRIS'].map(method => (
-                                            <label key={method} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', cursor: 'pointer', fontSize: '0.85rem' }}>
+                                            <label key={method} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '0.85rem', fontWeight: 500 }}>
                                                 <input
                                                     type="checkbox"
                                                     checked={regPaymentMethods.includes(method)}
@@ -352,15 +412,14 @@ export default function LoginTopBar() {
                                 </div>
                             </div>
 
-                            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                                <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '12px' }}>Daftar Sekarang</button>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+                                <button type="submit" className="btn btn-primary" style={{ padding: '14px' }}>DAFTARKAN TOKO SAYA</button>
                                 <button
                                     type="button"
-                                    className="btn btn-secondary"
-                                    style={{ flex: 1, background: '#eee', padding: '12px' }}
                                     onClick={() => setShowRegisterModal(false)}
+                                    style={{ background: 'none', border: 'none', color: 'var(--text-muted)', fontWeight: 500, fontSize: '0.9rem', cursor: 'pointer' }}
                                 >
-                                    Batal
+                                    KEMBALI
                                 </button>
                             </div>
                         </form>

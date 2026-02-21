@@ -220,210 +220,276 @@ Mohon diproses ya! Terima kasih.`;
         <div style={{
             position: 'fixed',
             top: 0, left: 0, right: 0, bottom: 0,
-            background: 'rgba(0,0,0,0.5)',
+            background: 'rgba(26, 10, 10, 0.85)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 2000,
             padding: '20px',
-            backdropFilter: 'blur(4px)'
+            backdropFilter: 'blur(10px)',
+            transition: 'all 0.3s ease'
         }}>
-            <div style={{
+            <div className="card animate-fade-in-up" style={{
                 background: 'white',
-                padding: '32px',
-                borderRadius: '16px',
+                padding: '40px',
+                borderRadius: '24px',
                 width: '100%',
-                maxWidth: '500px',
+                maxWidth: '600px',
                 maxHeight: '90vh',
                 overflowY: 'auto',
-                boxShadow: '0 10px 40px rgba(0,0,0,0.2)'
+                boxShadow: '0 25px 50px rgba(0,0,0,0.3)',
+                position: 'relative'
             }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
-                    <h2 style={{ fontSize: '1.5rem', margin: 0, color: 'var(--text-primary)' }}>Formulir Pemesanan</h2>
-                    <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+                    <div>
+                        <h2 style={{ fontSize: '1.8rem', margin: 0, color: 'var(--text-rich)', fontFamily: 'Playfair Display SC, serif' }}>Checkout Royale</h2>
+                        <div style={{ height: '3px', width: '50px', background: 'var(--secondary-color)', marginTop: '8px', borderRadius: '2px' }}></div>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        style={{
+                            background: '#f5f5f5',
+                            border: 'none',
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            fontSize: '1.5rem',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'var(--text-muted)'
+                        }}
+                    >&times;</button>
                 </div>
 
-                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Nama Lengkap</label>
-                        <input
-                            required
-                            type="text"
-                            value={formData.name}
-                            onChange={e => setFormData({ ...formData, name: e.target.value })}
-                            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '1rem' }}
-                            placeholder="Masukkan nama Anda"
-                        />
+                <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-gold)', letterSpacing: '1px' }}>NAMA LENGKAP</label>
+                            <input
+                                required
+                                type="text"
+                                value={formData.name}
+                                onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid #eee', background: '#fcfcfc', fontSize: '1rem' }}
+                                placeholder="E.g. Ken Dimsum"
+                            />
+                        </div>
+                        <div>
+                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-gold)', letterSpacing: '1px' }}>WHATSAPP</label>
+                            <input
+                                required
+                                type="tel"
+                                value={formData.whatsapp}
+                                onChange={e => {
+                                    const val = e.target.value;
+                                    if (/^\d*$/.test(val)) {
+                                        setFormData({ ...formData, whatsapp: val });
+                                    }
+                                }}
+                                pattern="[0-9]*"
+                                inputMode="numeric"
+                                style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid #eee', background: '#fcfcfc', fontSize: '1rem' }}
+                                placeholder="0812..."
+                            />
+                        </div>
                     </div>
 
                     <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Nomor WhatsApp</label>
-                        <input
-                            required
-                            type="tel"
-                            value={formData.whatsapp}
-                            onChange={e => {
-                                const val = e.target.value;
-                                if (/^\d*$/.test(val)) { // Only allow digits
-                                    setFormData({ ...formData, whatsapp: val });
-                                }
-                            }}
-                            pattern="[0-9]*" // Mobile numeric keypad hint
-                            inputMode="numeric"
-                            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '1rem' }}
-                            placeholder="Contoh: 08123456789"
-                        />
-                    </div>
-
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Metode Pengantaran</label>
-                        <div style={{ display: 'flex', gap: '12px' }}>
+                        <label style={{ display: 'block', marginBottom: '12px', fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-gold)', letterSpacing: '1px' }}>METODE PENYAJIAN</label>
+                        <div style={{ display: 'flex', gap: '16px' }}>
                             <button
                                 type="button"
                                 onClick={() => setFormData({ ...formData, deliveryMethod: 'delivery' })}
                                 style={{
                                     flex: 1,
-                                    padding: '12px',
-                                    borderRadius: '8px',
-                                    border: formData.deliveryMethod === 'delivery' ? '2px solid var(--primary-color)' : '1px solid var(--border-color)',
+                                    padding: '16px',
+                                    borderRadius: '16px',
+                                    border: formData.deliveryMethod === 'delivery' ? '2px solid var(--primary-color)' : '1px solid #eee',
                                     background: formData.deliveryMethod === 'delivery' ? '#fff5f5' : 'white',
-                                    fontWeight: formData.deliveryMethod === 'delivery' ? 'bold' : 'normal',
-                                    cursor: 'pointer'
+                                    fontWeight: formData.deliveryMethod === 'delivery' ? '800' : '500',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: '8px'
                                 }}
                             >
-                                🛵 Diantar ke Alamat
+                                <span style={{ fontSize: '1.5rem' }}>🛵</span>
+                                <span>Antar ke Alamat</span>
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setFormData({ ...formData, deliveryMethod: 'pickup' })}
                                 style={{
                                     flex: 1,
-                                    padding: '12px',
-                                    borderRadius: '8px',
-                                    border: formData.deliveryMethod === 'pickup' ? '2px solid var(--primary-color)' : '1px solid var(--border-color)',
+                                    padding: '16px',
+                                    borderRadius: '16px',
+                                    border: formData.deliveryMethod === 'pickup' ? '2px solid var(--primary-color)' : '1px solid #eee',
                                     background: formData.deliveryMethod === 'pickup' ? '#fff5f5' : 'white',
-                                    fontWeight: formData.deliveryMethod === 'pickup' ? 'bold' : 'normal',
-                                    cursor: 'pointer'
+                                    fontWeight: formData.deliveryMethod === 'pickup' ? '800' : '500',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.2s ease',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    gap: '8px'
                                 }}
                             >
-                                🛍️ Ambil di Resto
+                                <span style={{ fontSize: '1.5rem' }}>🛍️</span>
+                                <span>Ambil di Resto</span>
                             </button>
                         </div>
                     </div>
 
                     {formData.deliveryMethod === 'delivery' && (
-                        <div>
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Alamat Lengkap</label>
+                        <div className="animate-fade-in-up">
+                            <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-gold)', letterSpacing: '1px' }}>ALAMAT PENGIRIMAN</label>
                             <textarea
                                 required
                                 value={formData.address}
                                 onChange={e => setFormData({ ...formData, address: e.target.value })}
-                                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '1rem', minHeight: '80px' }}
-                                placeholder="Jalan, Nomor Rumah, RT/RW, Patokan..."
+                                style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid #eee', background: '#fcfcfc', fontSize: '1rem', minHeight: '100px' }}
+                                placeholder="Detail alamat lengkap Anda..."
                             />
                         </div>
                     )}
 
-                    {/* Payment Method Selection */}
-                    <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Metode Pembayaran</label>
+                    <div style={{ background: 'var(--bg-creamy)', padding: '24px', borderRadius: '20px', border: '1px solid rgba(212, 175, 55, 0.2)' }}>
+                        <label style={{ display: 'block', marginBottom: '16px', fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-gold)', letterSpacing: '1px' }}>PEMBAYARAN ROYAL</label>
                         <select
                             value={formData.paymentMethod}
                             onChange={e => setFormData({ ...formData, paymentMethod: e.target.value })}
-                            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '1rem' }}
+                            style={{
+                                width: '100%',
+                                padding: '14px',
+                                borderRadius: '12px',
+                                border: '1px solid var(--gold-border)',
+                                fontSize: '1rem',
+                                background: 'white',
+                                marginBottom: '20px',
+                                fontWeight: '600',
+                                color: 'var(--primary-dark)'
+                            }}
                         >
                             {(storeProfile?.paymentMethods || ['Tunai', 'Transfer Bank', 'QRIS']).map(method => (
                                 <option key={method} value={method}>{method}</option>
                             ))}
                         </select>
-                    </div>
 
-                    {/* Bank Info & QRIS Display per Store */}
-                    {(formData.paymentMethod === 'Transfer Bank' || formData.paymentMethod === 'QRIS') && (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                            {Object.keys(itemsByStore).map(sId => {
-                                const storeItems = itemsByStore[sId];
-                                const storeName = storeItems[0].storeName || 'Toko';
-                                const bankAccount = storeItems[0].bankAccount;
-                                const qrisImage = storeItems[0].qrisImage;
+                        {(formData.paymentMethod === 'Transfer Bank' || formData.paymentMethod === 'QRIS') && (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                                {Object.keys(itemsByStore).map(sId => {
+                                    const storeItems = itemsByStore[sId];
+                                    const storeName = storeItems[0].storeName || 'Toko';
+                                    const bankAccount = storeItems[0].bankAccount;
+                                    const qrisImage = storeItems[0].qrisImage;
 
-                                return (
-                                    <div key={sId} style={{ background: '#e3f2fd', padding: '16px', borderRadius: '8px', border: '1px solid #90caf9' }}>
-                                        <p style={{ margin: '0 0 8px 0', fontWeight: 'bold', color: '#0d47a1', fontSize: '1.05rem' }}>
-                                            💳 Info Pembayaran untuk {storeName}:
-                                        </p>
+                                    return (
+                                        <div key={sId} style={{
+                                            background: 'white',
+                                            padding: '20px',
+                                            borderRadius: '16px',
+                                            border: '1px solid rgba(0,0,0,0.05)',
+                                            boxShadow: '0 4px 15px rgba(0,0,0,0.03)'
+                                        }}>
+                                            <p style={{ margin: '0 0 12px 0', fontWeight: '800', color: 'var(--primary-color)', fontSize: '0.9rem', borderBottom: '1px solid #f5f5f5', paddingBottom: '8px' }}>
+                                                {storeName.toUpperCase()}
+                                            </p>
 
-                                        {formData.paymentMethod === 'Transfer Bank' && (
-                                            <div style={{ fontSize: '1rem', color: '#333' }}>
-                                                <p style={{ margin: '0 0 4px 0', fontSize: '0.9rem', color: '#666' }}>Tujuan Transfer:</p>
-                                                <strong>{bankAccount || 'Hubungi admin.'}</strong>
-                                            </div>
-                                        )}
+                                            {formData.paymentMethod === 'Transfer Bank' && (
+                                                <div>
+                                                    <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: '700' }}>VIRTUAL ACCOUNT / BANK:</p>
+                                                    <div style={{ background: '#f9f9f9', padding: '12px', borderRadius: '8px', fontSize: '1.1rem', fontWeight: '800', color: 'var(--text-rich)', border: '1px dashed var(--gold-border)' }}>
+                                                        {bankAccount || 'Hubungi admin di WhatsApp'}
+                                                    </div>
+                                                </div>
+                                            )}
 
-                                        {formData.paymentMethod === 'QRIS' && (
-                                            <div style={{ textAlign: 'center' }}>
-                                                {qrisImage ? (
-                                                    <>
-                                                        <p style={{ margin: '0 0 8px 0', fontSize: '0.9rem' }}>Silakan scan QRIS di bawah ini:</p>
+                                            {formData.paymentMethod === 'QRIS' && (
+                                                <div style={{ textAlign: 'center' }}>
+                                                    {qrisImage ? (
                                                         <img
                                                             src={qrisImage}
                                                             alt={`QRIS ${storeName}`}
-                                                            style={{ width: '100%', maxWidth: '250px', borderRadius: '8px', border: '1px solid #ddd', padding: '10px', background: 'white' }}
+                                                            style={{ width: '100%', maxWidth: '220px', borderRadius: '12px', border: '4px solid white', boxShadow: '0 5px 20px rgba(0,0,0,0.1)', padding: '10px', background: 'white' }}
                                                         />
-                                                    </>
-                                                ) : (
-                                                    <p style={{ fontStyle: 'italic', color: '#666' }}>QRIS belum tersedia untuk {storeName}.</p>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
+                                                    ) : (
+                                                        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>QRIS segera hadir.</p>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
 
-                    {/* Payment Proof Upload */}
-                    {(formData.paymentMethod === 'Transfer Bank' || formData.paymentMethod === 'QRIS') && (
-                        <div>
-                            <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Bukti Transfer (Wajib) <span style={{ color: 'red' }}>*</span></label>
-                            <input
-                                required
-                                type="file"
-                                accept="image/*"
-                                onChange={handleFileChange}
-                                style={{ width: '100%', padding: '8px', border: '1px solid var(--border-color)', borderRadius: '8px' }}
-                            />
-                            {paymentProof && (
-                                <div style={{ marginTop: '8px' }}>
-                                    <p style={{ fontSize: '0.8rem', color: 'green', margin: '0 0 4px 0' }}>✓ Gambar berhasil dipilih</p>
-                                    <img src={paymentProof} alt="Bukti Transfer" style={{ height: '60px', borderRadius: '4px', border: '1px solid #ddd' }} />
+                                <div>
+                                    <label style={{ display: 'block', marginBottom: '10px', fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-rich)' }}>UPLOAD BUKTI PEMBAYARAN <span style={{ color: 'red' }}>*</span></label>
+                                    <div style={{ position: 'relative' }}>
+                                        <input
+                                            required
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleFileChange}
+                                            style={{
+                                                width: '100%',
+                                                padding: '12px',
+                                                border: '2px dashed var(--gold-border)',
+                                                borderRadius: '12px',
+                                                background: 'white',
+                                                fontSize: '0.9rem'
+                                            }}
+                                        />
+                                    </div>
+                                    {paymentProof && (
+                                        <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                                            <img src={paymentProof} alt="Proof" style={{ height: '50px', width: '50px', objectFit: 'cover', borderRadius: '8px', border: '2px solid white', boxShadow: '0 4px 10px rgba(0,0,0,0.1)' }} />
+                                            <span style={{ fontSize: '0.85rem', color: '#27ae60', fontWeight: '700' }}>✓ Bukti Terunggah</span>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                    )}
+                            </div>
+                        )}
+                    </div>
 
                     <div>
-                        <label style={{ display: 'block', marginBottom: '8px', fontWeight: 500 }}>Catatan Tambahan (Opsional)</label>
+                        <label style={{ display: 'block', marginBottom: '8px', fontSize: '0.85rem', fontWeight: '800', color: 'var(--text-gold)', letterSpacing: '1px' }}>CATATAN (OPTIONAL)</label>
                         <input
                             type="text"
                             value={formData.notes}
                             onChange={e => setFormData({ ...formData, notes: e.target.value })}
-                            style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)', fontSize: '1rem' }}
-                            placeholder="Contoh: Jangan terlalu pedas"
+                            style={{ width: '100%', padding: '14px', borderRadius: '12px', border: '1px solid #eee', background: '#fcfcfc', fontSize: '1rem' }}
+                            placeholder="Contoh: Sangat pedas, atau jangan pakai kecap..."
                         />
                     </div>
 
-                    <div style={{ marginTop: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', fontWeight: 'bold' }}>
-                            <span>Total Tagihan:</span>
-                            <span style={{ color: 'var(--primary-color)' }}>Rp {total.toLocaleString('id-ID')}</span>
+                    <div style={{ marginTop: '20px', borderTop: '2px solid #f5f5f5', paddingTop: '24px' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                            <span style={{ fontSize: '1rem', color: 'var(--text-muted)', fontWeight: '600' }}>Total Pembayaran:</span>
+                            <span style={{ fontSize: '2rem', fontWeight: '900', color: 'var(--primary-color)' }}>
+                                <span style={{ fontSize: '1.2rem', marginRight: '4px' }}>Rp</span>
+                                {total.toLocaleString('id-ID')}
+                            </span>
                         </div>
                         <button
                             type="submit"
-                            className="btn btn-primary"
-                            style={{ width: '100%', padding: '14px', fontSize: '1.1rem' }}
+                            className="btn btn-primary btn-hover-scale"
+                            style={{
+                                width: '100%',
+                                padding: '20px',
+                                fontSize: '1.2rem',
+                                borderRadius: '18px',
+                                boxShadow: '0 15px 35px rgba(128, 0, 0, 0.25)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '12px'
+                            }}
                         >
-                            Buat Pesanan Sekarang 🚀
+                            <span>KONFIRMASI PESANAN</span>
+                            <span style={{ fontSize: '1.5rem' }}>🚀</span>
                         </button>
                     </div>
                 </form>
