@@ -193,7 +193,20 @@ export default function AdminOrdersPage() {
                                     </div>
                                 )}
 
-                                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+                                <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1.5rem', flexWrap: 'wrap' }}>
+                                    {/* WA Notification Button */}
+                                    <button
+                                        className="btn"
+                                        style={{ background: '#25D366', color: 'white', display: 'flex', alignItems: 'center', gap: '8px' }}
+                                        onClick={() => {
+                                            const trackingUrl = `${window.location.origin}/orders/${order.id}`;
+                                            const message = `Halo ${order.customerName}, pesanan Anda sedang *${order.status}*. \n\nCek status pesanan Anda secara real-time di sini:\n${trackingUrl}\n\nTerima kasih sudah memesan di Ken Dimsum!`;
+                                            window.open(`https://wa.me/${order.customerWhatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
+                                        }}
+                                    >
+                                        📲 Kabari via WA
+                                    </button>
+
                                     {order.status === 'BARU' && (
                                         <button
                                             className="btn"

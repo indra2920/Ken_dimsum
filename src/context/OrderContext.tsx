@@ -32,7 +32,7 @@ export interface Order {
 interface OrderContextType {
     orders: Order[];
     isLoading: boolean;
-    addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'status'>, storeId?: string) => Promise<void>;
+    addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'status'>, storeId?: string) => Promise<Order | null>;
     updateOrderStatus: (orderId: string, status: Order['status']) => Promise<void>;
     newOrderAlert: Order | null;
     clearAlert: () => void;
@@ -130,9 +130,9 @@ export function OrderProvider({ children }: { children: ReactNode }) {
         return () => clearInterval(interval);
     }, [storeId]);
 
-    const addOrder = async (orderData: Omit<Order, 'id' | 'createdAt' | 'status'>, forcedStoreId?: string) => {
+    const addOrder = async (orderData: Omit<Order, 'id' | 'createdAt' | 'status'>, forcedStoreId?: string): Promise<Order | null> => {
         const targetStoreId = forcedStoreId || storeId;
-        if (!targetStoreId) return;
+        if (!targetStoreId) return null;
         const res = await fetch('/api/orders', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -142,6 +142,7 @@ export function OrderProvider({ children }: { children: ReactNode }) {
         const created: Order = await res.json();
         knownOrderIds.current.add(created.id); // Don't alert for own order
         setOrders(prev => [created, ...prev]);
+        return created;
     };
 
     const updateOrderStatus = async (orderId: string, status: Order['status']) => {

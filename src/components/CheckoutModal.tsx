@@ -88,6 +88,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, total, onCle
         try {
             // 2. Process orders for each store
             const storeIds = Object.keys(itemsByStore);
+            const createdOrders: any[] = [];
 
             for (const sId of storeIds) {
                 const storeItems = itemsByStore[sId];
@@ -95,7 +96,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, total, onCle
                 const storeName = storeItems[0].storeName || 'Toko';
 
                 // Save to In-App Order System (Modified to pass storeId explicitly)
-                await addOrder({
+                const res = await addOrder({
                     customerName: formData.name,
                     customerWhatsapp: formData.whatsapp,
                     tableNumber: formData.deliveryMethod === 'pickup' ? 'Ambil Sendiri' : formData.address,
@@ -105,7 +106,11 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, total, onCle
                     paymentMethod: formData.paymentMethod,
                     paymentProof: paymentProof,
                     deliveryMethod: formData.deliveryMethod as 'pickup' | 'delivery'
-                }, sId); // Passing storeId as second argument
+                }, sId);
+
+                if (res) {
+                    createdOrders.push(res);
+                }
 
                 // Reduce stock
                 storeItems.forEach(item => {
@@ -117,11 +122,14 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, total, onCle
                 });
 
                 // Prepare WhatsApp Message for this store
+                const trackingUrl = res ? `${window.location.origin}/orders/${res.id}` : '';
                 const message = `Halo ${storeName}, saya ingin pesan:
             
 ${storeItems.map(item => `- ${item.name} (${item.quantity}x) - Rp ${(item.price * item.quantity).toLocaleString('id-ID')}`).join('\n')}
 
 Total: Rp ${storeTotal.toLocaleString('id-ID')}
+
+${trackingUrl ? `Lacak Pesanan: ${trackingUrl}` : ''}
 
 ---------------------------
 Data Pemesan:
@@ -131,7 +139,6 @@ Metode: ${formData.deliveryMethod === 'pickup' ? 'Ambil di Resto' : 'Diantar ke 
 ${formData.deliveryMethod === 'delivery' ? `Alamat: ${formData.address}` : ''}
 Pembayaran: ${formData.paymentMethod}
 Catatan: ${formData.notes || '-'}
-${paymentProof ? 'Bukti Transfer: (Terlampir di Aplikasi)' : ''}
 
 Mohon diproses ya! Terima kasih.`;
 
@@ -150,7 +157,10 @@ Mohon diproses ya! Terima kasih.`;
 
             onClearCart();
             onClose();
-            alert("Semua pesanan Anda telah berhasil dikirim ke masing-masing toko!");
+
+            // Final feedback with all tracking links
+            const orderLinks = createdOrders.map(o => `- ${o.storeName || 'Toko'}: ${window.location.origin}/orders/${o.id}`).join('\n');
+            alert(`Semua pesanan Anda telah berhasil dikirim!\n\nSimpan link pelacakan Anda:\n${orderLinks}`);
         } catch (error) {
             console.error("Multi-store checkout error:", error);
             alert("Terjadi kesalahan saat memproses pesanan Anda.");
