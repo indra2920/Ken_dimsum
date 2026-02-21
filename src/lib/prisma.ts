@@ -2,21 +2,15 @@ import { PrismaClient } from '@prisma/client';
 import { PrismaNeon } from '@prisma/adapter-neon';
 
 const globalForPrisma = globalThis as unknown as {
-    prisma: PrismaClient | undefined;
+    prisma: PrismaClient | undefined | null;
 };
 
-/**
- * Creates a new Prisma client with the Neon adapter.
- * Only called when actually needed during runtime.
- */
 function createPrismaClient() {
     const url = process.env.DATABASE_URL;
 
     if (!url) {
-        throw new Error(
-            'Koneksi database (DATABASE_URL) tidak ditemukan. ' +
-            'Pastikan Environment Variables sudah terpasang di Vercel.'
-        );
+        // Return null instead of throwing to let the module load during build
+        return null;
     }
 
     try {
@@ -31,18 +25,35 @@ function createPrismaClient() {
 
         return client;
     } catch (error: any) {
-        console.error('Gagal inisialisasi Prisma Neon:', error);
-        throw new Error(`Gagal menghubungkan ke database: ${error.message}`);
+        console.error('Failed to create Prisma Neon adapter:', error);
+        return null;
     }
 }
 
-// Export a Proxy that initializes the real Prisma client on first access.
-// This prevents build-time errors while allowing runtime functionality.
+// Super-Safe Proxy: Prevents both build-time crashes and runtime "null" errors
 export const prisma = new Proxy({} as PrismaClient, {
     get: (target, prop) => {
-        if (!globalForPrisma.prisma) {
+        // Initialize once on first access
+        if (globalForPrisma.prisma === undefined) {
             globalForPrisma.prisma = createPrismaClient();
         }
-        return (globalForPrisma.prisma as any)[prop];
+
+        const client = globalForPrisma.prisma;
+
+        if (!client) {
+            // Return a dummy proxy for any property access if DB URL is missing
+            return new Proxy({}, {
+                get: () => {
+                    return () => {
+                        throw new Error(
+                            'Database Error: DATABASE_URL tidak ditemukan di Vercel. ' +
+                            'Pastikan Anda sudah menyalin variabel environment dari Dashboard Neon ke Dashboard Vercel.'
+                        );
+                    };
+                }
+            });
+        }
+
+        return (client as any)[prop];
     }
 });
