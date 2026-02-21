@@ -119,7 +119,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             if (!res.ok) {
                 const errorData = await res.json();
-                throw new Error(errorData.error || 'Failed to register store');
+                const errorMessage = errorData.details
+                    ? `${errorData.error}: ${errorData.details}`
+                    : errorData.error || 'Failed to register store';
+                throw new Error(errorMessage);
             }
 
             const store = await res.json();
