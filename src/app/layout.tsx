@@ -1,5 +1,7 @@
 // Deployment trigger: 2026-02-21
 import type { Metadata } from "next";
+
+export const dynamic = 'force-dynamic';
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ProductProvider } from "@/context/ProductContext";
