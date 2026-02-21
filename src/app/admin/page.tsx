@@ -5,11 +5,13 @@ import { useProducts } from '@/context/ProductContext';
 import { useAuth } from '@/context/AuthContext';
 import { Product } from '@/context/ProductContext';
 import Link from 'next/link';
+import StoreProfileModal from '@/components/StoreProfileModal';
 
 export default function AdminPage() {
     const { products, categories, addProduct, updateProduct, deleteProduct, addCategory } = useProducts();
     const { isLoggedIn } = useAuth();
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
     // Form State
@@ -72,7 +74,16 @@ export default function AdminPage() {
         <div className="container" style={{ padding: 'clamp(1rem, 3vw, 2rem)' }}>
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '12px' }}>
                 <h1 style={{ fontSize: 'clamp(1.4rem, 4vw, 2rem)' }}>Inventory Management</h1>
-                <Link href="/" className="btn btn-secondary" style={{ fontSize: '0.85rem', padding: '8px 16px' }}>Back to Store</Link>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <button
+                        className="btn btn-secondary"
+                        onClick={() => setIsProfileModalOpen(true)}
+                        style={{ fontSize: '0.85rem', padding: '8px 16px', backgroundColor: '#f0f0f0', color: '#333' }}
+                    >
+                        ⚙️ Pengaturan Toko
+                    </button>
+                    <Link href="/" className="btn btn-secondary" style={{ fontSize: '0.85rem', padding: '8px 16px' }}>Back to Store</Link>
+                </div>
             </header>
 
             <div className="card">
@@ -151,7 +162,7 @@ export default function AdminPage() {
                 </div>
             </div>
 
-            {/* Modal */}
+            {/* Product Modal */}
             {isModalOpen && (
                 <div style={{
                     position: 'fixed',
@@ -291,6 +302,12 @@ export default function AdminPage() {
                     </div>
                 </div>
             )}
+
+            {/* Store Profile Modal */}
+            <StoreProfileModal
+                isOpen={isProfileModalOpen}
+                onClose={() => setIsProfileModalOpen(false)}
+            />
         </div>
     );
 }
