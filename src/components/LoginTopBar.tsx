@@ -132,6 +132,12 @@ export default function LoginTopBar() {
                                 >
                                     Hi, {storeProfile?.ownerName || 'Owner'}
                                 </span>
+                                <span
+                                    style={{ color: 'white', cursor: 'pointer', whiteSpace: 'nowrap', fontSize: '0.85rem' }}
+                                    onClick={() => setShowProfileModal(true)}
+                                >
+                                    ⚙️ Pengaturan
+                                </span>
                                 <Link href="/admin/orders" style={{ color: 'white', whiteSpace: 'nowrap' }}>Pesanan</Link>
                                 <Link href="/admin" style={{ color: 'white', whiteSpace: 'nowrap' }}>Produk</Link>
                                 <Link href="/pos" style={{ color: 'white', whiteSpace: 'nowrap' }}>POS</Link>
