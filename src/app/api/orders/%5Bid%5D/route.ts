@@ -5,10 +5,10 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(
     request: Request,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const orderId = params.id;
+        const { id: orderId } = await params;
 
         const order = await prisma.order.findUnique({
             where: { id: orderId },
