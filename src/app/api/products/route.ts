@@ -3,24 +3,34 @@ import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
-// GET all products by store
+// GET all products (optionally filtered by store)
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
         const storeId = searchParams.get('storeId');
 
-        if (!storeId) {
-            // If no storeId, return empty or all? For multi-tenant, we usually want to be strict.
-            // But for the customer page, we might need a way to find a store.
-            // Let's return all for now if no storeId, but the plan says filter.
-            return NextResponse.json({ error: 'Store ID is required' }, { status: 400 });
+        let products;
+        if (storeId) {
+            products = await prisma.product.findMany({
+                where: { storeId },
+                include: { store: { select: { storeName: true } } }
+            });
+        } else {
+            // Aggregator mode: fetch all products from all stores
+            products = await prisma.product.findMany({
+                include: { store: { select: { storeName: true } } }
+            });
         }
 
-        const products = await prisma.product.findMany({
-            where: { storeId }
-        });
-        return NextResponse.json(products);
+        // Flatten storeName into product object for easier frontend use
+        const formattedProducts = products.map(p => ({
+            ...p,
+            storeName: p.store.storeName
+        }));
+
+        return NextResponse.json(formattedProducts);
     } catch (error) {
+        console.error('Fetch products error:', error);
         return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
     }
 }

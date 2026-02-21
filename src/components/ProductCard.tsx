@@ -28,11 +28,31 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onAddToCart }) => {
                 overflow: 'hidden',
                 marginBottom: '4px'
             }}>
-                {(product.image.startsWith('data:') || product.image.startsWith('http')) ? (
-                    <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s ease' }} />
-                ) : (
-                    <span style={{ fontSize: '5rem', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.1))' }}>{product.image}</span>
-                )}
+                <div style={{ position: 'relative' }}>
+                    {(product.image.startsWith('data:') || product.image.startsWith('http')) ? (
+                        <img src={product.image} alt={product.name} style={{ width: '100%', height: '180px', objectFit: 'cover' }} />
+                    ) : (
+                        <div style={{ height: '180px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '4rem', background: '#f5f5f5' }}>
+                            {product.image}
+                        </div>
+                    )}
+                    {product.storeName && (
+                        <div style={{
+                            position: 'absolute',
+                            top: '10px',
+                            right: '10px',
+                            background: 'rgba(212, 175, 55, 0.9)',
+                            color: '#2D0A0A',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            fontSize: '0.7rem',
+                            fontWeight: 'bold',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                        }}>
+                            🏪 {product.storeName}
+                        </div>
+                    )}
+                </div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

@@ -78,62 +78,8 @@ export default function Home() {
 
   const cartTotalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
-  // If no store is selected and not logged in, show store selector
-  if (!activeStoreId && !isLoggedIn && !isLoadingSettings) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <LoginTopBar />
-        <div className="container" style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '40px 20px' }}>
-          <div style={{ maxWidth: '600px', width: '100%', textAlign: 'center' }}>
-            <h1 style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>Selamat Datang di Ken Dimsum</h1>
-            <p style={{ color: 'var(--text-secondary)', marginBottom: '3rem' }}>Silakan pilih toko untuk melihat menu </p>
-
-            {isLoadingStores ? (
-              <p>Memuat daftar toko...</p>
-            ) : availableStores.length > 0 ? (
-              <div style={{ display: 'grid', gap: '16px' }}>
-                {availableStores.map(store => (
-                  <Link
-                    key={store.id}
-                    href={`/?storeId=${store.id}`}
-                    className="card"
-                    style={{
-                      padding: '24px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      textDecoration: 'none',
-                      color: 'inherit',
-                      transition: 'transform 0.2s',
-                      textAlign: 'left'
-                    }}
-                    onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-                    onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                  >
-                    <div>
-                      <h3 style={{ margin: 0, fontSize: '1.2rem', color: 'var(--primary-color)' }}>{store.storeName}</h3>
-                      <p style={{ margin: '4px 0 0', fontSize: '0.9rem', opacity: 0.7 }}>Pemilik: {store.ownerName}</p>
-                    </div>
-                    <span style={{ fontSize: '1.5rem' }}>👉</span>
-                  </Link>
-                ))}
-              </div>
-            ) : (
-              <div style={{ padding: '40px', background: '#f9f9f9', borderRadius: '12px' }}>
-                <p>Belum ada toko yang terdaftar.</p>
-                <p style={{ fontSize: '0.9rem' }}>Silakan "Daftar" di atas untuk membuat toko pertama!</p>
-              </div>
-            )}
-          </div>
-        </div>
-        <footer style={{ background: '#2D0A0A', color: 'rgba(255,255,255,0.6)', padding: '40px 0', textAlign: 'center' }}>
-          <p>&copy; 2024 Ken Dimsum Platform. All rights reserved.</p>
-        </footer>
-      </div>
-    );
-  }
-
-  const currentStoreName = storeProfile?.storeName || 'Ken Dimsum';
+  // No longer blocking with store selector. We show aggregator by default.
+  const currentStoreName = storeProfile?.storeName || (activeStoreId ? availableStores.find(s => s.id === activeStoreId)?.storeName : 'Ken Dimsum Platform');
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>

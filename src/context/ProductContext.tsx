@@ -11,6 +11,8 @@ export interface Product {
     image: string;
     description: string;
     stock: number;
+    storeId: string;
+    storeName?: string;
 }
 
 interface ProductContextType {
@@ -23,7 +25,7 @@ interface ProductContextType {
     deleteProduct: (id: string) => Promise<void>;
     updateStock: (id: string, newStock: number) => Promise<void>;
     addCategory: (category: string) => void;
-    refreshProducts: () => Promise<void>;
+    refreshProducts: (storeId?: string) => Promise<void>;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -41,19 +43,23 @@ export function ProductProvider({ children }: { children: ReactNode }) {
         setLowStockAlerts(currentProducts.filter(p => p.stock < 10));
     };
 
-    const fetchProducts = async (retries = 3) => {
-        if (!storeId) {
-            setIsLoading(false);
-            return;
-        }
+    const fetchProducts = async (forcedStoreId?: string, retries = 3) => {
+        const targetStoreId = forcedStoreId || storeId;
+
+        // If not logged in and no forced store ID, we fetch ALL products for the aggregator
+        const url = targetStoreId ? `/api/products?storeId=${targetStoreId}` : `/api/products`;
 
         for (let attempt = 1; attempt <= retries; attempt++) {
             try {
-                const res = await fetch(`/api/products?storeId=${storeId}`);
+                const res = await fetch(url);
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data: Product[] = await res.json();
                 setProducts(data);
-                checkLowStock(data);
+
+                // Only check low stock if we are in a specific store context (logged in)
+                if (targetStoreId) {
+                    checkLowStock(data);
+                }
 
                 // Derive unique categories from products
                 const uniqueCategories = Array.from(new Set(data.map(p => p.category)));
@@ -75,6 +81,8 @@ export function ProductProvider({ children }: { children: ReactNode }) {
     };
 
     useEffect(() => {
+        // If we have a storeId (logged in), fetch that store's products.
+        // Otherwise, fetch ALL products for the aggregator.
         fetchProducts();
     }, [storeId]);
 

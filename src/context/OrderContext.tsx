@@ -32,7 +32,7 @@ export interface Order {
 interface OrderContextType {
     orders: Order[];
     isLoading: boolean;
-    addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'status'>) => Promise<void>;
+    addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'status'>, storeId?: string) => Promise<void>;
     updateOrderStatus: (orderId: string, status: Order['status']) => Promise<void>;
     newOrderAlert: Order | null;
     clearAlert: () => void;
@@ -68,24 +68,32 @@ export function OrderProvider({ children }: { children: ReactNode }) {
                     setNewOrderAlert(newOrders[0]);
 
                     // Simple notification sound using Web Audio API
+                    // Prominent "Ding-Dong" melody using Web Audio API
                     const playNotificationSound = () => {
                         try {
                             const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
-                            const oscillator = audioCtx.createOscillator();
-                            const gainNode = audioCtx.createGain();
 
-                            oscillator.connect(gainNode);
-                            gainNode.connect(audioCtx.destination);
+                            const playTone = (freq: number, start: number, duration: number) => {
+                                const osc = audioCtx.createOscillator();
+                                const gain = audioCtx.createGain();
+                                osc.connect(gain);
+                                gain.connect(audioCtx.destination);
 
-                            oscillator.type = 'sine';
-                            oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
-                            oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.5); // A4
+                                osc.type = 'sine';
+                                osc.frequency.setValueAtTime(freq, start);
+                                gain.gain.setValueAtTime(0, start);
+                                gain.gain.linearRampToValueAtTime(0.2, start + 0.05);
+                                gain.gain.exponentialRampToValueAtTime(0.01, start + duration);
 
-                            gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+                                osc.start(start);
+                                osc.stop(start + duration);
+                            };
 
-                            oscillator.start();
-                            oscillator.stop(audioCtx.currentTime + 0.5);
+                            const now = audioCtx.currentTime;
+                            // Ding
+                            playTone(660, now, 0.6); // E5
+                            // Dong
+                            playTone(523, now + 0.5, 0.8); // C5
                         } catch (err) {
                             console.warn('Could not play notification sound:', err);
                         }
@@ -122,12 +130,13 @@ export function OrderProvider({ children }: { children: ReactNode }) {
         return () => clearInterval(interval);
     }, [storeId]);
 
-    const addOrder = async (orderData: Omit<Order, 'id' | 'createdAt' | 'status'>) => {
-        if (!storeId) return;
+    const addOrder = async (orderData: Omit<Order, 'id' | 'createdAt' | 'status'>, forcedStoreId?: string) => {
+        const targetStoreId = forcedStoreId || storeId;
+        if (!targetStoreId) return;
         const res = await fetch('/api/orders', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ ...orderData, storeId }),
+            body: JSON.stringify({ ...orderData, storeId: targetStoreId }),
         });
         if (!res.ok) throw new Error('Failed to create order');
         const created: Order = await res.json();

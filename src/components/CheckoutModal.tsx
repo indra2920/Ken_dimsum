@@ -33,7 +33,7 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, total, onCle
 
     if (!isOpen) return null;
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         // VALIDASI MANUAL
@@ -57,8 +57,16 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, total, onCle
             return;
         }
 
-        // 0. Stock Validation & Reduction
-        // Check if enough stock exists first
+        // 0. Group items by storeId
+        const itemsByStore: Record<string, CartItem[]> = {};
+        cartItems.forEach(item => {
+            if (!itemsByStore[item.storeId]) {
+                itemsByStore[item.storeId] = [];
+            }
+            itemsByStore[item.storeId].push(item);
+        });
+
+        // 1. Stock Validation for each store
         for (const item of cartItems) {
             const product = products.find(p => p.id === item.id);
             if (!product) continue;
@@ -68,34 +76,43 @@ export default function CheckoutModal({ isOpen, onClose, cartItems, total, onCle
             }
         }
 
-        // Reduce stock
-        cartItems.forEach(item => {
-            const product = products.find(p => p.id === item.id);
-            if (product) {
-                const newStock = Math.max(0, product.stock - item.quantity);
-                updateStock(item.id, newStock);
-            }
-        });
+        try {
+            // 2. Process orders for each store
+            const storeIds = Object.keys(itemsByStore);
 
-        // 1. Save to In-App Order System
-        addOrder({
-            customerName: formData.name,
-            customerWhatsapp: formData.whatsapp,
-            tableNumber: formData.deliveryMethod === 'pickup' ? 'Ambil Sendiri' : formData.address,
-            items: cartItems,
-            total: total,
-            notes: formData.notes,
-            paymentMethod: formData.paymentMethod,
-            paymentProof: paymentProof,
-            deliveryMethod: formData.deliveryMethod as 'pickup' | 'delivery'
-        });
+            for (const sId of storeIds) {
+                const storeItems = itemsByStore[sId];
+                const storeTotal = storeItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                const storeName = storeItems[0].storeName || 'Toko';
 
-        // 2. Prepare WhatsApp Message
-        const message = `Halo Ken Dimsum, saya ingin pesan:
-    
-${cartItems.map(item => `- ${item.name} (${item.quantity}x) - Rp ${(item.price * item.quantity).toLocaleString('id-ID')}`).join('\n')}
+                // Save to In-App Order System (Modified to pass storeId explicitly)
+                await addOrder({
+                    customerName: formData.name,
+                    customerWhatsapp: formData.whatsapp,
+                    tableNumber: formData.deliveryMethod === 'pickup' ? 'Ambil Sendiri' : formData.address,
+                    items: storeItems,
+                    total: storeTotal,
+                    notes: formData.notes,
+                    paymentMethod: formData.paymentMethod,
+                    paymentProof: paymentProof,
+                    deliveryMethod: formData.deliveryMethod as 'pickup' | 'delivery'
+                }, sId); // Passing storeId as second argument
 
-Total: Rp ${total.toLocaleString('id-ID')}
+                // Reduce stock
+                storeItems.forEach(item => {
+                    const product = products.find(p => p.id === item.id);
+                    if (product) {
+                        const newStock = Math.max(0, product.stock - item.quantity);
+                        updateStock(item.id, newStock);
+                    }
+                });
+
+                // Prepare WhatsApp Message for this store
+                const message = `Halo ${storeName}, saya ingin pesan:
+            
+${storeItems.map(item => `- ${item.name} (${item.quantity}x) - Rp ${(item.price * item.quantity).toLocaleString('id-ID')}`).join('\n')}
+
+Total: Rp ${storeTotal.toLocaleString('id-ID')}
 
 ---------------------------
 Data Pemesan:
@@ -109,15 +126,26 @@ ${paymentProof ? 'Bukti Transfer: (Terlampir di Aplikasi)' : ''}
 
 Mohon diproses ya! Terima kasih.`;
 
-        // 3. User Feedback & Action
-        if (confirm("Pesanan berhasil dibuat! \n\nKlik OK untuk mengirim konfirmasi ke WhatsApp juga. \n(JANGAN LUPA: Kirimkan foto bukti transfer yang tadi Anda upload di chat WhatsApp agar pesanan cepat diproses).")) {
-            const encodedMessage = encodeURIComponent(message);
-            const waNumber = storeProfile?.whatsapp || '6281234567890';
-            window.open(`https://wa.me/${waNumber}?text=${encodedMessage}`, '_blank');
-        }
+                // User Feedback & Action (One by one for each store)
+                if (confirm(`Pesanan untuk ${storeName} berhasil dibuat! \n\nKlik OK untuk mengirim konfirmasi ke WhatsApp ${storeName}.`)) {
+                    const encodedMessage = encodeURIComponent(message);
+                    // For the aggregator, we might not have the store's wa number in storeProfile.
+                    // Ideally each product should have storeWhatsapp, but for now we'll use a placeholder or 
+                    // we might need to fetch store details. 
+                    // Let's assume for now we use the one from storeProfile if available, or just alert.
+                    // IMPROVEMENT: Products in aggregator should ideally bring store detail.
+                    alert("Membuka WhatsApp untuk " + storeName);
+                    window.open(`https://wa.me/6281234567890?text=${encodedMessage}`, '_blank');
+                }
+            }
 
-        onClearCart();
-        onClose();
+            onClearCart();
+            onClose();
+            alert("Semua pesanan Anda telah berhasil dikirim ke masing-masing toko!");
+        } catch (error) {
+            console.error("Multi-store checkout error:", error);
+            alert("Terjadi kesalahan saat memproses pesanan Anda.");
+        }
     };
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

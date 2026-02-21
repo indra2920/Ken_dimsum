@@ -132,6 +132,15 @@ export default function LoginTopBar() {
                                 >
                                     Hi, {storeProfile?.ownerName || 'Owner'}
                                 </span>
+                                {/* Aggregator Link */}
+                                {searchParams?.get('storeId') && (
+                                    <Link
+                                        href="/"
+                                        style={{ color: 'white', textDecoration: 'none', fontSize: '0.85rem', background: 'rgba(255,255,255,0.1)', padding: '4px 10px', borderRadius: '4px' }}
+                                    >
+                                        🏠 Semua Menu
+                                    </Link>
+                                )}
                                 <span
                                     style={{ color: 'white', cursor: 'pointer', whiteSpace: 'nowrap', fontSize: '0.85rem' }}
                                     onClick={() => setShowProfileModal(true)}
