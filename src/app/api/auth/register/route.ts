@@ -7,7 +7,7 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         const {
-            storeName,
+            storeName: rawStoreName,
             ownerName,
             password,
             address,
@@ -16,6 +16,8 @@ export async function POST(request: Request) {
             qrisImage,
             paymentMethods
         } = body;
+
+        const storeName = rawStoreName?.trim();
 
         // Check if store name already exists
         const existingStore = await prisma.store.findUnique({

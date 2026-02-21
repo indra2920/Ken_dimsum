@@ -6,7 +6,8 @@ export const dynamic = 'force-dynamic';
 export async function POST(request: Request) {
     try {
         const body = await request.json();
-        const { storeName, password } = body;
+        const { storeName: rawStoreName, password } = body;
+        const storeName = rawStoreName?.trim();
 
         // Find store by name (case-insensitive search would be better, but prisma findUnique is case sensitive for string IDs/uniques)
         // Using findFirst for case-insensitive simulation or just strict check for now
