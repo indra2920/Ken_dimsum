@@ -12,6 +12,7 @@ export default function LoginTopBar() {
     const [showProfileModal, setShowProfileModal] = useState(false);
 
     // Login State
+    const [loginStoreName, setLoginStoreName] = useState('');
     const [loginPassword, setLoginPassword] = useState('');
     const [loginError, setLoginError] = useState('');
 
@@ -22,13 +23,14 @@ export default function LoginTopBar() {
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        const success = await login(loginPassword);
+        const success = await login(loginStoreName, loginPassword);
         if (success) {
             setShowLoginModal(false);
+            setLoginStoreName('');
             setLoginPassword('');
             setLoginError('');
         } else {
-            setLoginError('Password salah!');
+            setLoginError('Nama toko atau password salah!');
         }
     };
 
@@ -76,7 +78,7 @@ export default function LoginTopBar() {
                         ) : (
                             <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
                                 <span style={{ cursor: 'pointer', fontWeight: '600', color: 'white', whiteSpace: 'nowrap' }} onClick={() => setShowRegisterModal(true)}>Daftar</span>
-                                <span style={{ cursor: 'pointer', fontWeight: '600', color: 'var(--secondary-color)', whiteSpace: 'nowrap' }} onClick={() => setShowLoginModal(true)}>Login Admin</span>
+                                <span style={{ cursor: 'pointer', fontWeight: '600', color: 'var(--secondary-color)', whiteSpace: 'nowrap' }} onClick={() => setShowLoginModal(true)}>Login sebagai Pemilik Toko</span>
                             </div>
                         )}
                     </div>
@@ -98,9 +100,21 @@ export default function LoginTopBar() {
                         <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Login Pemilik Toko</h2>
                         <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                             <div>
+                                <label style={{ display: 'block', marginBottom: '0.5rem' }}>Nama Toko</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={loginStoreName}
+                                    onChange={(e) => setLoginStoreName(e.target.value)}
+                                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
+                                    placeholder="Masukkan nama toko"
+                                />
+                            </div>
+                            <div>
                                 <label style={{ display: 'block', marginBottom: '0.5rem' }}>Password</label>
                                 <input
                                     type="password"
+                                    required
                                     value={loginPassword}
                                     onChange={(e) => setLoginPassword(e.target.value)}
                                     style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
@@ -120,7 +134,7 @@ export default function LoginTopBar() {
                                 </button>
                             </div>
                             <p style={{ fontSize: '0.8rem', color: '#888', textAlign: 'center', marginTop: '1rem' }}>
-                                Hint: password is <b>admin123</b>
+                                Hint: {storeProfile.storeName} / admin123
                             </p>
                         </form>
                     </div>

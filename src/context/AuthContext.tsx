@@ -14,7 +14,7 @@ interface AuthContextType {
     isLoggedIn: boolean;
     isLoadingSettings: boolean;
     storeProfile: StoreProfile;
-    login: (password: string) => Promise<boolean>;
+    login: (storeName: string, password: string) => Promise<boolean>;
     register: (password: string, storeName: string, ownerName: string) => Promise<void>;
     updateProfile: (data: Partial<StoreProfile>) => Promise<void>;
     logout: () => void;
@@ -67,8 +67,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     }, []);
 
-    const login = async (password: string): Promise<boolean> => {
-        if (password === dbPassword) {
+    const login = async (storeName: string, password: string): Promise<boolean> => {
+        if (storeName === storeProfile.storeName && password === dbPassword) {
             setIsLoggedIn(true);
             return true;
         }
