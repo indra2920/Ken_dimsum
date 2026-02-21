@@ -38,8 +38,17 @@ export async function POST(request: Request) {
         });
 
         return NextResponse.json(store);
-    } catch (error) {
-        console.error('Registration error:', error);
-        return NextResponse.json({ error: 'Failed to register store' }, { status: 500 });
+    } catch (error: any) {
+        console.error('Registration error details:', error);
+
+        // Handle Prisma specific errors (like unique constraint)
+        if (error.code === 'P2002') {
+            return NextResponse.json({ error: 'Nama toko sudah digunakan. Silakan gunakan nama lain.' }, { status: 400 });
+        }
+
+        return NextResponse.json({
+            error: 'Gagal dalam proses database',
+            details: error.message
+        }, { status: 500 });
     }
 }

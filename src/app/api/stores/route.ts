@@ -11,8 +11,11 @@ export async function GET() {
             }
         });
         return NextResponse.json(stores);
-    } catch (error) {
-        console.error('List stores error:', error);
-        return NextResponse.json({ error: 'Failed to fetch stores' }, { status: 500 });
+    } catch (error: any) {
+        console.error('List stores error details:', error);
+        return NextResponse.json({
+            error: 'Failed to fetch stores',
+            details: error.message
+        }, { status: 500 });
     }
 }
