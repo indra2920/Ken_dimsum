@@ -146,7 +146,6 @@ export default function OrderTrackingPage() {
                     }}>{order.status}</h2>
 
                     <p style={{
-                        margin: 0,
                         opacity: 0.95,
                         fontSize: '1.1rem',
                         fontWeight: '500',
