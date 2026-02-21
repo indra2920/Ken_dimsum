@@ -8,9 +8,14 @@ const globalForPrisma = globalThis as unknown as {
 function createPrismaClient() {
     const url = process.env.DATABASE_URL;
 
+    // During build, DATABASE_URL might be missing. 
+    // We must NOT return a standard PrismaClient() if the schema has no URL, 
+    // as it will crash looking for a datasource.
     if (!url) {
-        console.error('DATABASE_URL is not defined in environment variables');
-        return new PrismaClient(); // Fallback to standard client which will likely fail but prevents crash during init
+        if (process.env.NODE_ENV === 'production') {
+            console.log('Skipping Prisma initialization during build (no DATABASE_URL)');
+        }
+        return null as unknown as PrismaClient;
     }
 
     try {
@@ -20,7 +25,7 @@ function createPrismaClient() {
         return new PrismaClient({ adapter } as any);
     } catch (error) {
         console.error('Failed to create Prisma Neon adapter:', error);
-        return new PrismaClient();
+        return null as unknown as PrismaClient;
     }
 }
 
