@@ -1,5 +1,5 @@
 import React from 'react';
-import { Product } from '../data/mockData';
+import { Product } from '@/context/ProductContext';
 
 interface ProductCardProps {
     product: Product;

@@ -4,9 +4,11 @@ import { useAuth } from '@/context/AuthContext';
 import Link from 'next/link';
 import { useState } from 'react';
 import StoreProfileModal from '@/components/StoreProfileModal';
+import { useSearchParams } from 'next/navigation';
 
 export default function LoginTopBar() {
     const { isLoggedIn, login, logout, register, storeProfile } = useAuth();
+    const searchParams = useSearchParams();
     const [showLoginModal, setShowLoginModal] = useState(false);
     const [showRegisterModal, setShowRegisterModal] = useState(false);
     const [showProfileModal, setShowProfileModal] = useState(false);

@@ -23,7 +23,7 @@ export async function GET(request: Request) {
         }
 
         // Flatten storeName into product object for easier frontend use
-        const formattedProducts = products.map(p => ({
+        const formattedProducts = products.map((p: any) => ({
             ...p,
             storeName: p.store.storeName
         }));
