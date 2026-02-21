@@ -12,7 +12,7 @@ export default function AdminOrdersPage() {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
     // Sort orders: Newest first
-    const sortedOrders = [...orders].sort((a, b) => b.createdAt - a.createdAt);
+    const sortedOrders = [...orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     const filteredOrders = filter === 'ALL'
         ? sortedOrders
