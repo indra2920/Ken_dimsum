@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
-import { defineConfig, env } from "prisma/config";
+import { defineConfig } from "prisma/config";
 
-// Load .env.local which is used by Next.js
+// Load .env.local (Next.js convention) — ignored if file doesn't exist (e.g. on Vercel)
 dotenv.config({ path: ".env.local" });
 
 export default defineConfig({
@@ -9,7 +9,9 @@ export default defineConfig({
     migrations: {
         path: "prisma/migrations",
     },
+    // Use process.env directly with fallback so prisma generate doesn't fail
+    // if DATABASE_URL is not yet available (e.g. during Vercel postinstall phase)
     datasource: {
-        url: env("DATABASE_URL"),
+        url: process.env.DATABASE_URL ?? "postgresql://localhost:5432/placeholder",
     },
 });
